@@ -13,8 +13,8 @@
 | Phase | Hoạt động | Output | Commit? |
 |---|---|---|---|
 | **0. Setup** | SSO, init project, cài MoMorph CLI, `momorph init` sinh `.claude/` | `.claude/`, `.momorph/`, `.vscode/`, `supabase/` | ✅ `chore: project setup` |
-| **1. Spec (local)** | `/momorph.specify` + `/momorph.reviewspecify` kéo spec từ MoMorph server về repo | `specs/<screen>/spec.md`, `design-style.md` | ✅ `docs(spec): local specs from MoMorph` |
-| **2. Plan + Tasks** | `/momorph.constitution` + `/momorph.plan` + `/momorph.reviewplan` + `/momorph.tasks` | `specs/<screen>/plan.md`, `tasks.md`, constitution | ✅ `docs(plan): plan + tasks` |
+| **1. Spec (local)** | `/momorph.constitution` (1 lần) + `/momorph.specify` (+ `/momorph.reviewspecify` nếu cần) kéo spec từ MoMorph server về repo. Skill `momorph.specify` mới **không sinh `design-style.md`** nữa — visual CSS sẽ được fetch on-demand ở Phase 3. | `.momorph/constitution.md`, `.momorph/SCREENFLOW.md`, `.momorph/specs/<screenId>-<slug>/spec.md` | ✅ `docs(spec): local specs from MoMorph` |
+| **2. Plan + Tasks** | `/momorph.plan` + `/momorph.reviewplan` + `/momorph.tasks`. **Lưu ý:** template `momorph.specify` mới đã gộp Functional Requirements / Key Entities / API Dependencies vào spec.md, nên plan.md tập trung vào những thứ chưa nói: chọn library cụ thể, file-tree, ordering tasks, research findings, integration testing strategy. | `.momorph/specs/<screenId>-<slug>/plan.md`, `tasks.md` | ✅ `docs(plan): plan + tasks` |
 | **3. Implementation** | `/momorph.implement` (TDD, fix bugs) | source code BE + tests | ✅ `feat: implement <screen>` (1 commit/screen) |
 | **4. Test & Review** | Bổ sung test, chạy test suite, review | `test/**`, kết quả run | ✅ `test: integration + endpoint tests` |
 | **5. Báo cáo** | Trả lời câu hỏi báo cáo Sun* | `REPORT.md` | ✅ `docs: practice report` |
@@ -132,7 +132,9 @@ Test: unit + integration, AC coverage 100%.
 ```
 
 ### Bước 1.2. Filter screens (nếu cần)
-VSCode Command Palette → **MoMorph: Filter Screens** → chọn page phù hợp (ví dụ "Web" nếu Server-side serve cho Web client) → Spec Status: **Done**.
+2 cách:
+- **UI:** VSCode Command Palette → **MoMorph: Filter Screens** → chọn page phù hợp (ví dụ "Web" nếu Server-side serve cho Web client) → Spec Status: **Done**.
+- **MCP trực tiếp (alternative dùng được trong Claude REPL):** gọi tool `mcp__momorph__list_frames` với `fileKey` của project; filter trên kết quả những frame có `tags` chứa `"Spec Created"` — đó là các frame đã có spec sẵn trên MoMorph server.
 
 ### Bước 1.3. Kéo spec từng screen về local
 Với mỗi screen Server-side cần implement (login, register, list, detail, CRUD APIs...):
@@ -140,7 +142,9 @@ Với mỗi screen Server-side cần implement (login, register, list, detail, C
 /momorph.specify Tạo specs cho màn hình <screen-name>:
 <momorph-frame-url>
 ```
-Output: `specs/<screen>/spec.md` + `design-style.md`.
+Output: `.momorph/specs/<screenId>-<slug>/spec.md` (skill mới **không** sinh `design-style.md`/asset files nữa — visual CSS được fetch on-demand ở Phase 3 implement).
+
+Skill cũng tự sinh hoặc cập nhật `.momorph/SCREENFLOW.md` (overview tất cả screens, navigation graph, running API table).
 
 ### Bước 1.4. Review spec (chạy 2–3 lần để refine)
 ```
@@ -148,16 +152,17 @@ Output: `specs/<screen>/spec.md` + `design-style.md`.
 <momorph-frame-url>
 ```
 
-### Bước 1.5. So sánh với spec mẫu (cho báo cáo)
-Nhờ Claude diff spec local vs spec mẫu (nếu BTC cung cấp):
+### Bước 1.5. So sánh với spec mẫu (cho báo cáo) — *skip nếu không có sample*
+Nếu BTC cung cấp spec mẫu, nhờ Claude diff:
 ```
-> So sánh specs/login/spec.md với docs/specs-original/login.md,
+> So sánh .momorph/specs/<screenId>-<slug>/spec.md với docs/specs-original/<screen>.md,
   liệt kê các điểm giống/khác và đánh giá độ chính xác %
 ```
-**Ghi lại % accuracy** — sẽ dùng cho REPORT.md.
+**Ghi lại % accuracy vào `docs/comparison-spec.md`** — sẽ dùng cho REPORT.md.
+Nếu BTC không cung cấp sample → ghi nhận đánh giá định tính trong REPORT.md ở Phase 5.
 
-🔖 **COMMIT 2**: `docs(spec): pull local specs from MoMorph server`
-File: `specs/<screen>/spec.md`, `specs/<screen>/design-style.md`, `docs/comparison-spec.md`.
+🔖 **COMMIT 2**: `docs(spec): local specs from MoMorph for <N> BE screens`
+File: `.momorph/constitution.md`, `.momorph/SCREENFLOW.md`, `.momorph/specs/<screenId>-<slug>/spec.md` (mỗi screen 1 file), `docs/comparison-spec.md` (nếu Bước 1.5 chạy).
 
 ---
 
@@ -170,7 +175,15 @@ Với mỗi screen:
 Hãy tạo kế hoạch phát triển server-side cho màn hình <screen-name>:
 <momorph-frame-url>
 ```
-Output: `specs/<screen>/plan.md` — chứa API contract, DB schema, file paths, test plan.
+Output: `.momorph/specs/<screenId>-<slug>/plan.md`.
+
+**Lưu ý phạm vi plan.md** — template `momorph.specify` mới đã đưa API contract, DB schema chi tiết, FR/TR, Key Entities vào trong spec.md. Để tránh trùng lặp, plan.md cần tập trung vào:
+- Lựa chọn library/version cụ thể (zod x.y.z, npm/deno imports đã pin).
+- File tree dự kiến (`supabase/functions/<name>/index.ts`, `supabase/migrations/...`).
+- Thứ tự task / dependencies giữa các phase (migration → RLS → function → tests).
+- Research findings (ví dụ Supabase Auth hook API hiện tại, pg_cron syntax).
+- Integration testing strategy chi tiết (test runner, mock OIDC server, seed strategy).
+- Constitution Compliance Check rõ ràng.
 
 ### Bước 2.2. Review plan (2–3 lần)
 ```
@@ -183,7 +196,7 @@ Output: `specs/<screen>/plan.md` — chứa API contract, DB schema, file paths,
 /momorph.tasks Hãy phân chia công việc phát triển server-side cho màn <screen-name>:
 <momorph-frame-url>
 ```
-Output: `specs/<screen>/tasks.md`.
+Output: `.momorph/specs/<screenId>-<slug>/tasks.md`.
 
 🔖 **COMMIT 3**: `docs(plan): plan + tasks for <screens>`
 
@@ -273,17 +286,19 @@ Tạo `REPORT.md` trả lời các câu hỏi báo cáo của Sun*. Tối thiể
 | `CLAUDE.md` | Role, tech stack, convention, test cmd |
 | `.claude/` | Do `momorph init` sinh ra — commands, agents, MCP config |
 | `.claude/settings.local.json` | MCP credentials — **không commit** |
-| `.momorph/` | MoMorph project config |
+| `.momorph/` | MoMorph project config + constitution + SCREENFLOW + specs |
+| `.momorph/constitution.md` | Output `/momorph.constitution` — single source of truth cho principles + tech stack |
+| `.momorph/SCREENFLOW.md` | Output `/momorph.specify` — overview tất cả screens + navigation graph + running API table |
+| `.momorph/specs/<screenId>-<slug>/` | Output của `/momorph.specify` (spec.md), `/momorph.plan` (plan.md), `/momorph.tasks` (tasks.md) |
 | `.vscode/` | Prompt files cho MoMorph Extension |
 | `.gitignore` | Loại `settings.local.json`, `.env`, `supabase/.temp/` |
-| `specs/<screen>/` | Output của `/momorph.specify`, `.plan`, `.tasks` |
 
 ---
 
 ## ✅ Tổng cộng ~6–8 commits
 
 1. `chore: project setup — momorph init + claude code config`
-2. `docs(spec): pull local specs from MoMorph server`
+2. `docs(spec): local specs from MoMorph for <N> BE screens`
 3. `docs(plan): plan + tasks for <screens>`
 4. `feat(api): implement <screen-1>`
 5. `feat(api): implement <screen-2>` … (tuỳ số screen)
