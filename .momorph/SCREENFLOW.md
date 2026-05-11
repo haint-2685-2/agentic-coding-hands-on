@@ -26,12 +26,12 @@
 
 | # | Screen Name | Frame ID | Figma Link | Status | Detail File | Predicted APIs | Navigates To |
 |---|-------------|----------|------------|--------|-------------|----------------|--------------|
-| 1 | Login | `GzbNeVGJHz` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/GzbNeVGJHz) | spec'd | `specs/GzbNeVGJHz-login/spec.md` | OAuth callback, session, logout, user profile, language pref | Homepage SAA |
-| 2 | Homepage SAA | `i87tDx10uM` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/i87tDx10uM) | spec'd | `specs/i87tDx10uM-homepage-saa/spec.md` | event config, awards catalog, notifications (list + unread-count + mark-read) | Live board, Viết Kudo, Hệ thống giải, Open secret box |
-| 3 | Sun* Kudos — Live board | `MaZUn5xHXZ` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | spec'd | `specs/MaZUn5xHXZ-kudos-live-board/spec.md` | feed, highlights (mv), spotlight, stats, hashtags, departments, like RPC, user lookup | Viết Kudo, Secret Box, Profile |
-| 4 | Viết Kudo | `ihQ26W78P2` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | spec'd | `specs/ihQ26W78P2-viet-kudo/spec.md` | POST /kudos (RPC), upload-url, /users typeahead, /hashtags?q, notifications produced | Live board |
-| 5 | Hệ thống giải | `zFYDgyj_pD` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/zFYDgyj_pD) | spec'd | `specs/zFYDgyj_pD-he-thong-giai/spec.md` | extends award (long_desc, quantity, unit, value_vnd); GET /awards/{slug}; GET /awards?detail=true | Homepage SAA |
-| 6 | Open secret box — chưa mở | `J3-4YFIpMM` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | spec'd | `specs/J3-4YFIpMM-open-secret-box/spec.md` | badge catalog (drop weights), secret_box entity, RPC fn_open_secret_box (FOR UPDATE SKIP LOCKED) | Homepage SAA |
+| 1 | Login | `GzbNeVGJHz` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/GzbNeVGJHz) | planned | spec / plan / tasks | OAuth callback, session, logout, user profile, language pref | Homepage SAA |
+| 2 | Homepage SAA | `i87tDx10uM` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/i87tDx10uM) | planned | spec / plan / tasks | event config, awards catalog, notifications (list + unread-count + mark-read) | Live board, Viết Kudo, Hệ thống giải, Open secret box |
+| 3 | Sun* Kudos — Live board | `MaZUn5xHXZ` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | planned | spec / plan / tasks | feed, highlights (mv), spotlight, stats, hashtags, departments, like RPC, user lookup | Viết Kudo, Secret Box, Profile |
+| 4 | Viết Kudo | `ihQ26W78P2` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | planned | spec / plan / tasks | POST /kudos (RPC), upload-url, /users typeahead, /hashtags?q, notifications produced | Live board |
+| 5 | Hệ thống giải | `zFYDgyj_pD` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/zFYDgyj_pD) | planned | spec / plan / tasks | extends award (long_desc, quantity, unit, value_vnd); GET /awards/{slug}; GET /awards?detail=true | Homepage SAA |
+| 6 | Open secret box — chưa mở | `J3-4YFIpMM` | [open](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | planned | spec / plan / tasks | badge catalog (drop weights), secret_box entity, RPC fn_open_secret_box (FOR UPDATE SKIP LOCKED) | Homepage SAA |
 
 ---
 
