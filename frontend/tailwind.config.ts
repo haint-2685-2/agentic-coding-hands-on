@@ -13,10 +13,16 @@ const config: Config = {
         foreground: "var(--foreground)",
         // Login screen tokens (from Figma)
         "saa-bg": "rgba(0, 16, 26, 1)",
-        "saa-header": "rgba(11, 15, 18, 0.8)",
+        "saa-header": "rgba(16, 20, 23, 0.8)",
         "saa-cta": "rgba(255, 234, 158, 1)",
         "saa-cta-foreground": "rgba(0, 16, 26, 1)",
         "saa-divider": "#2E3940",
+        // Homepage tokens (from Figma)
+        "saa-gold": "#FFEA9E",
+        "saa-gold-glow": "#FAE287",
+        "saa-border": "#998C5F",
+        "saa-danger": "#D4271D",
+        "saa-card": "rgba(255, 255, 255, 0.04)",
       },
       fontFamily: {
         montserrat: ["var(--font-montserrat)", "Montserrat", "sans-serif"],
