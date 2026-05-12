@@ -1,12 +1,12 @@
 # SAA 2025 — Sun* Annual Awards (Monorepo)
 
 Mock project cho kỳ exam internal Sun* — re-implement Sun* Kudos / Annual Awards
-với 2 layer: **backend** (Supabase BaaS) và **frontend** (chưa khởi tạo).
+với 2 layer: **backend** (Supabase BaaS) và **frontend** (Next.js 14 App Router).
 
 ```
 saa-2025/
 ├── backend/        ← server-side (Supabase BaaS) — đã hoàn thiện
-└── frontend/       ← placeholder; sẽ tạo từ Figma qua MoMorph
+└── frontend/       ← Next.js 14 + Tailwind + supabase-js — đã hoàn thiện
 ```
 
 Cả hai layer **share cùng 1 git repo** (monorepo) và cùng 1 MoMorph project
@@ -33,10 +33,35 @@ Viết Kudo · Hệ thống giải · Open Secret Box.
 | Workflow checklist | [backend/docs/playbook.md](./backend/docs/playbook.md) |
 | Practice report | [backend/REPORT.md](./backend/REPORT.md) |
 
-### [frontend/](./frontend) — chưa khởi tạo
+### [frontend/](./frontend) — đã hoàn thiện (Phase 0–5)
 
-Sẽ được sinh từ Figma qua `/momorph.implement-ui` skill khi cần. Stack đề xuất:
-Next.js 14 + Tailwind + `@supabase/supabase-js`.
+Next.js 14 App Router + TypeScript + Tailwind CSS + `@supabase/supabase-js` cho
+6 màn UI cùng MoMorph screen IDs với BE. ~9.5K LOC TS/TSX + 57 binary assets
+từ Figma. tsc + lint + build clean; Playwright E2E scaffold sẵn sàng.
+
+| Tài nguyên | Đường dẫn |
+|---|---|
+| Spec + plan + tasks per screen | [frontend/.momorph/specs/](./frontend/.momorph/specs/) |
+| Constitution (5 principles) | [frontend/.momorph/constitution.md](./frontend/.momorph/constitution.md) |
+| App routes (Next App Router) | [frontend/app/](./frontend/app/) |
+| Feature components per screen | [frontend/components/feature/](./frontend/components/feature/) |
+| Typed API wrappers + helpers | [frontend/lib/](./frontend/lib/) |
+| i18n tables (vi / en / ja) | [frontend/lib/i18n/](./frontend/lib/i18n/) |
+| Figma assets per screen | [frontend/public/assets/](./frontend/public/assets/) |
+| Playwright E2E (7 specs) | [frontend/tests/e2e/](./frontend/tests/e2e/) |
+| Workflow checklist | [frontend/docs/playbook.md](./frontend/docs/playbook.md) |
+| Practice report | [frontend/REPORT.md](./frontend/REPORT.md) |
+
+Routes:
+
+| Path | Mô tả | Auth |
+|---|---|---|
+| `/login` | Google OAuth + locale picker | anon entry |
+| `/` | Homepage (hero/countdown/awards grid/footer) | authed |
+| `/kudos` | Live board (feed, highlights, filters, spotlight) | authed |
+| `/kudos/new` | Viết Kudo (form full-page + intercepted modal) | authed |
+| `/awards` | Hệ thống giải (6 sections, scroll-spy, VND prizes) | authed |
+| `/secret-box` | Open Secret Box (badge reveal modal) | authed |
 
 ---
 
@@ -60,7 +85,7 @@ supabase db reset --no-seed
 # 4. Serve 19 Edge Functions (background)
 supabase functions serve --no-verify-jwt &
 
-# 5. Export env (URL/keys/JWT secret in vào test process)
+# 5. Export env (URL/keys/JWT secret vào test process)
 while IFS='=' read -r k v; do
   v_clean="${v%\"}"; v_clean="${v_clean#\"}"
   export "SUPABASE_$k=$v_clean"
@@ -78,6 +103,49 @@ Chi tiết stack 12 containers + image versions → [backend/docs/docker.md](./b
 
 ---
 
+## Chạy frontend local (TL;DR)
+
+Prerequisites: Node ≥ 18, pnpm. **Cần backend stack đang chạy** (xem trên).
+
+```bash
+# 1. Tools (một lần)
+corepack enable && corepack prepare pnpm@latest --activate              # pnpm
+
+# 2. Install deps (lần đầu)
+cd frontend
+pnpm install
+
+# 3. Env — copy example rồi điền anon key từ BE
+cp .env.local.example .env.local
+# NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=<lấy bằng: cd ../backend && supabase status -o env>
+
+# 4. Chạy dev server (port 3000)
+pnpm dev
+
+# 5. (Optional) Playwright E2E — cần BE Edge Functions cũng đang serve
+pnpm exec playwright install   # lần đầu
+pnpm e2e                       # 7 spec files
+```
+
+FE truy cập: <http://localhost:3000> (redirect → `/login` nếu chưa auth).
+
+**FE không cần Docker** — chạy thẳng node runtime. Chỉ BE dùng Supabase Docker
+stack.
+
+### Auth khi test local
+
+Google OAuth ở local KHÔNG end-to-end vì `SUPABASE_AUTH_EXTERNAL_GOOGLE_URL`
+chưa set. 2 lựa chọn:
+
+1. **Tạo Google OAuth App thật** → thêm `CLIENT_ID` + `SECRET` vào
+   `backend/supabase/.env.local`, restart `supabase start`. Đây là cách production.
+2. **Bypass nhanh:** tạo user qua Supabase Studio (<http://localhost:54323> →
+   Authentication → Users → Add user, bật "Auto Confirm"). Trong app DevTools
+   console, dùng `supabase.auth.signInWithPassword(...)` để mint session.
+
+---
+
 ## API overview
 
 Backend phục vụ 22 endpoints (19 Edge Function + 6 Supabase Auth built-in
@@ -91,36 +159,34 @@ truyền qua `Authorization: Bearer <token>`.
 
 Tham khảo spec đầy đủ cho từng màn hình:
 
-- [Login](./backend/.momorph/specs/GzbNeVGJHz-login/spec.md)
-- [Homepage SAA](./backend/.momorph/specs/i87tDx10uM-homepage-saa/spec.md)
-- [Sun* Kudos — Live board](./backend/.momorph/specs/MaZUn5xHXZ-kudos-live-board/spec.md)
-- [Viết Kudo](./backend/.momorph/specs/ihQ26W78P2-viet-kudo/spec.md)
-- [Hệ thống giải](./backend/.momorph/specs/zFYDgyj_pD-he-thong-giai/spec.md)
-- [Open Secret Box](./backend/.momorph/specs/J3-4YFIpMM-open-secret-box/spec.md)
+| Screen | BE spec | FE spec |
+|---|---|---|
+| Login | [BE](./backend/.momorph/specs/GzbNeVGJHz-login/spec.md) | [FE](./frontend/.momorph/specs/GzbNeVGJHz-login/spec.md) |
+| Homepage SAA | [BE](./backend/.momorph/specs/i87tDx10uM-homepage-saa/spec.md) | [FE](./frontend/.momorph/specs/i87tDx10uM-homepage-saa/spec.md) |
+| Sun* Kudos — Live board | [BE](./backend/.momorph/specs/MaZUn5xHXZ-kudos-live-board/spec.md) | [FE](./frontend/.momorph/specs/MaZUn5xHXZ-kudos-live-board/spec.md) |
+| Viết Kudo | [BE](./backend/.momorph/specs/ihQ26W78P2-viet-kudo/spec.md) | [FE](./frontend/.momorph/specs/ihQ26W78P2-viet-kudo/spec.md) |
+| Hệ thống giải | [BE](./backend/.momorph/specs/zFYDgyj_pD-he-thong-giai/spec.md) | [FE](./frontend/.momorph/specs/zFYDgyj_pD-he-thong-giai/spec.md) |
+| Open Secret Box | [BE](./backend/.momorph/specs/J3-4YFIpMM-open-secret-box/spec.md) | [FE](./frontend/.momorph/specs/J3-4YFIpMM-open-secret-box/spec.md) |
 
 ---
 
-## Khi tạo frontend
+## Cross-layer contracts
 
-1. Vào `frontend/`, `momorph init . --ai claude`.
-2. Tạo `frontend/CLAUDE.md` với role = Frontend Engineer + stack chọn.
-3. `/momorph.constitution …` cho FE.
-4. `/momorph.specify` lại 6 màn (cùng MoMorph URLs với BE — họ share design source).
-5. `/momorph.implement-ui` sinh UI từ Figma (skill này tự fetch CSS, auto-fix
-   diff Playwright qua 3 vòng).
-6. Trỏ FE tới BE — env vars FE cần:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<từ `supabase status -o env` ở backend/>
-   ```
+| Contract | BE source | FE consumer |
+|---|---|---|
+| Error envelope `{ error: { code, message, fields? } }` | [BE constitution §IV](./backend/.momorph/constitution.md) | `frontend/lib/api/*` wrappers |
+| Google OAuth domain (`hd=sun-asterisk.com`) | `backend/supabase/config.toml` | `lib/auth/*` + `GoogleLoginButton` |
+| Locale cookie `saa_locale` | BE seeds default ở `auth/callback` | FE `lib/auth/locale-cookie.ts` |
+| Storage public path | BE issues URLs | FE `BadgeReveal` với `<img onError>` fallback |
+| Additional redirect URL `http://localhost:3000` | `backend/supabase/config.toml` (đã thêm) | — |
 
-### BE cần điều chỉnh khi FE chạy thật
+### BE config khi deploy thật
 
 | File | Thay đổi |
 |---|---|
 | [backend/supabase/.env.local](./backend/supabase/.env.local.example) | Real Google OAuth `CLIENT_ID` + `SECRET` |
-| [backend/supabase/config.toml](./backend/supabase/config.toml) | Thêm `additional_redirect_urls` của FE |
-| [backend/supabase/functions/_shared/http.ts](./backend/supabase/functions/_shared/http.ts) | (Khuyến nghị) đổi CORS từ `*` về domain FE cụ thể cho production |
+| [backend/supabase/config.toml](./backend/supabase/config.toml) | `additional_redirect_urls` thay localhost bằng domain prod |
+| [backend/supabase/functions/_shared/http.ts](./backend/supabase/functions/_shared/http.ts) | (Khuyến nghị) đổi CORS từ `*` về domain FE cụ thể |
 
 ---
 
@@ -133,15 +199,20 @@ Tham khảo spec đầy đủ cho từng màn hình:
   implement. Co-author `Claude Opus 4.7 (1M context)`.
 
 ```bash
-git log --oneline | head -15
+git log --oneline | head -20
 ```
 
-Xem chi tiết quy trình 5 phase trong [backend/docs/playbook.md](./backend/docs/playbook.md).
+Xem chi tiết quy trình 5 phase trong [backend/docs/playbook.md](./backend/docs/playbook.md)
+và [frontend/docs/playbook.md](./frontend/docs/playbook.md).
 
 ---
 
 ## Kiểm tra constitution compliance
 
-Backend pass cả 5 nguyên tắc cốt lõi (Server-Side Only · RLS-First · TDD ·
-Validation & Secure Coding · Migration & Commit Discipline). Bằng chứng cụ thể:
-[backend/REPORT.md §8](./backend/REPORT.md).
+- **Backend** pass cả 5 nguyên tắc cốt lõi (Server-Side Only · RLS-First · TDD ·
+  Validation & Secure Coding · Migration & Commit Discipline). Bằng chứng:
+  [backend/REPORT.md §8](./backend/REPORT.md).
+- **Frontend** pass 4/5 nguyên tắc (Frontend-Only Scope · Server Components by
+  Default · A11y & Secure Coding · Spec-Driven Commits & Pin Discipline);
+  Principle III (TDD) ⚠️ scaffold sẵn sàng nhưng chưa green-run vì offline.
+  Bằng chứng: [frontend/REPORT.md §8](./frontend/REPORT.md).
