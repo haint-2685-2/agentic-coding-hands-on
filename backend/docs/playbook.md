@@ -59,7 +59,7 @@ momorph whoami           # verify identity
 ```
 
 ### Bước 0.5. Khởi tạo project Server-side
-Repo này (`saa-2025-server`) là working dir. Chọn 1 trong 2 hướng stack cho role Server-side:
+Working dir là `saa-2025/backend/` trong monorepo (FE ở `saa-2025/frontend/`, share cùng git history). Chọn 1 trong 2 hướng stack cho role Server-side:
 
 | Hướng | Khi nào dùng |
 |---|---|
@@ -68,8 +68,8 @@ Repo này (`saa-2025-server`) là working dir. Chọn 1 trong 2 hướng stack c
 
 Setup git remote theo yêu cầu của MoMorph (extension cần `upstream` để hiển thị Figma frames):
 ```bash
-cd ~/Desktop/Projects/saa-2025-server
-git init                                                              # nếu chưa có
+cd ~/Desktop/Projects/saa-2025/backend
+git init                                                              # nếu chưa có (init ở root saa-2025/)
 git checkout -b feature/saa-2025-exam
 git remote add origin   git@github.com:<your-username>/agentic-coding-hands-on.git
 git remote add upstream git@github.com:sun-asterisk-internal/agentic-coding-hands-on.git
