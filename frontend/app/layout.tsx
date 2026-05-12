@@ -33,10 +33,15 @@ export const metadata: Metadata = {
   description: "SAA 2025 — Sun* Kudos & Annual Awards",
 };
 
+// Parallel route slot consumed by intercepted overlays (e.g.
+// `app/@modal/(.)kudos/new/page.tsx`). Next.js always supplies the slot
+// (using `app/@modal/default.tsx` as fallback), so it is non-optional.
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -44,6 +49,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${montserratAlternates.variable} antialiased`}
       >
         {children}
+        {modal}
       </body>
     </html>
   );
