@@ -15,7 +15,7 @@ export interface HomeStrings {
   days: string;
   hours: string;
   minutes: string;
-  countdownSummary: (d: string, h: string, m: string) => string;
+  countdownSummary: string;
   // Event info
   eventTimeFallback: string;
   eventLocationFallback: string;
@@ -63,7 +63,7 @@ const vi: HomeStrings = {
   days: 'DAYS',
   hours: 'HOURS',
   minutes: 'MINUTES',
-  countdownSummary: (d, h, m) => `Còn ${d} ngày ${h} giờ ${m} phút`,
+  countdownSummary: 'Còn {d} ngày {h} giờ {m} phút',
   eventTimeFallback: '18h30 · 20/12/2025',
   eventLocationFallback: 'Sun* HQ, Hà Nội',
   broadcastNoteFallback: 'Livestream trên Sun* Workplace',
@@ -104,7 +104,7 @@ const en: HomeStrings = {
   days: 'DAYS',
   hours: 'HOURS',
   minutes: 'MINUTES',
-  countdownSummary: (d, h, m) => `${d} days ${h} hours ${m} minutes remaining`,
+  countdownSummary: '{d} days {h} hours {m} minutes remaining',
   eventTimeFallback: '6:30 PM · 20 Dec 2025',
   eventLocationFallback: 'Sun* HQ, Hanoi',
   broadcastNoteFallback: 'Livestream on Sun* Workplace',
@@ -132,7 +132,46 @@ const en: HomeStrings = {
   widgetRules: 'SAA Rules',
 };
 
-const ja: HomeStrings = { ...vi }; // Not exposed in UI, but parseable.
+const ja: HomeStrings = {
+  navAbout: 'SAA 2025 について',
+  navAwards: '賞のカテゴリー',
+  navKudos: 'Sun* Kudos',
+  languagePickerLabel: '言語を選択',
+  notificationLabel: '通知',
+  accountLabel: 'アカウント',
+  heroLine1: 'ROOT',
+  heroLine2: 'FURTHER',
+  comingSoon: 'まもなく開催',
+  days: 'DAYS',
+  hours: 'HOURS',
+  minutes: 'MINUTES',
+  countdownSummary: '残り {d} 日 {h} 時間 {m} 分',
+  eventTimeFallback: '18:30 · 2025年12月20日',
+  eventLocationFallback: 'Sun* HQ、ハノイ',
+  broadcastNoteFallback: 'Sun* Workplace でライブ配信',
+  ctaAwards: 'ABOUT AWARDS',
+  ctaKudos: 'ABOUT KUDOS',
+  awardsSectionTitle: '賞のカテゴリー',
+  awardsSectionSubtitle: '2025年で最も活躍した Sun-er を称える 6 つの名誉ある賞。',
+  awardsEmpty: '近日公開',
+  awardsError: '賞の一覧を読み込めませんでした。もう一度お試しください。',
+  awardDetail: '詳細を見る',
+  kudosTitle: 'Sun* Kudos',
+  kudosBody:
+    '同僚への感謝と称賛を届けましょう。ひとつひとつの Kudo が Sun* のカルチャーを形づくります。',
+  kudosCta: '詳細を見る',
+  footer: '© 2025 Sun* All rights reserved.',
+  footerStandards: 'ガイドライン',
+  menuProfile: 'プロフィール',
+  menuAdmin: '管理者ダッシュボード',
+  menuSignOut: 'サインアウト',
+  notificationsHeading: '通知',
+  notificationsEmpty: '通知はまだありません',
+  markAllRead: 'すべて既読にする',
+  widgetWriteKudo: 'Kudos を書く',
+  widgetViewAwards: '賞を見る',
+  widgetRules: 'SAA の規約',
+};
 
 const TABLE: Record<Locale, HomeStrings> = { vi, en, ja };
 

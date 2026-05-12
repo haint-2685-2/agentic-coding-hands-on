@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import { readLocaleFromCookies } from '@/lib/auth/locale-cookie';
 import { getOptionalMe } from '@/lib/auth/optional-session';
 import { getEventConfig } from '@/lib/api/home/config';
@@ -11,15 +12,19 @@ import { KudosPromo } from '@/components/feature/home/KudosPromo';
 import { HomeFooter } from '@/components/feature/home/HomeFooter';
 import { FloatingWidget } from '@/components/feature/home/FloatingWidget';
 
-// Public RSC. Re-validates server-side data once per minute to match the
-// BE `Cache-Control: public, max-age=60` envelope on /config/event + /awards.
-export const revalidate = 60;
+// Auth-gated entry point. Per BE login spec, `/login` is the unauthenticated
+// entry of SAA 2025; anon visitors are bounced there.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
+  const me = await getOptionalMe();
+  if (!me) {
+    redirect('/login?next=/');
+  }
+
   const locale = readLocaleFromCookies();
   const strings = getHomeStrings(locale);
-  const [me, eventConfig, awardsResult] = await Promise.all([
-    getOptionalMe(),
+  const [eventConfig, awardsResult] = await Promise.all([
     getEventConfig(),
     listAwards(locale === 'ja' ? 'vi' : locale),
   ]);

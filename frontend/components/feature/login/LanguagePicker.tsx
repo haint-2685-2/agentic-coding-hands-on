@@ -3,10 +3,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   LOCALE_COOKIE_NAME,
+  LOCALE_FLAGS,
   LOCALE_LABELS,
   SUPPORTED_LOCALES,
   type Locale,
@@ -25,7 +25,6 @@ function writeLocaleCookie(value: Locale): void {
 }
 
 export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
-  const router = useRouter();
   const listboxId = useId();
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState<number>(() =>
@@ -49,10 +48,14 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
     (next: Locale) => {
       writeLocaleCookie(next);
       close();
-      buttonRef.current?.focus();
-      router.refresh();
+      // Hard reload to force every RSC up the tree to re-fetch with the new
+      // cookie. router.refresh() is unreliable here because Next 14 dev keeps
+      // the RSC payload cached when only a cookie changes.
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
     },
-    [router, close],
+    [close],
   );
 
   const onTriggerKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -103,14 +106,12 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
         className="flex h-[56px] w-[108px] items-center justify-between gap-[2px] rounded-[4px] p-[16px] text-white outline-none transition-colors hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-white/60"
       >
         <span className="flex h-[24px] w-[53px] items-center gap-[4px]">
-          <Image
-            src="/assets/login/flag-vn.svg"
-            alt=""
+          <span
             aria-hidden="true"
-            width={24}
-            height={24}
-            className="h-[24px] w-[24px]"
-          />
+            className="inline-flex h-[24px] w-[24px] items-center justify-center text-[20px] leading-none"
+          >
+            {LOCALE_FLAGS[locale]}
+          </span>
           <span
             className="inline-block w-[25px] text-center font-montserrat text-[16px] font-bold leading-[24px] tracking-[0.15px] text-white"
           >
@@ -149,12 +150,15 @@ export function LanguagePicker({ locale, ariaLabel }: LanguagePickerProps) {
                 onMouseEnter={() => setHighlight(idx)}
                 onClick={() => commit(value)}
                 className={[
-                  'cursor-pointer px-4 py-2 font-montserrat text-[14px] font-semibold leading-[20px] text-white',
+                  'flex cursor-pointer items-center gap-2 px-4 py-2 font-montserrat text-[14px] font-semibold leading-[20px] text-white',
                   highlighted ? 'bg-white/10' : 'bg-transparent',
                   selected ? 'text-white' : 'text-white/80',
                 ].join(' ')}
               >
-                {LOCALE_LABELS[value]}
+                <span aria-hidden="true" className="text-[16px] leading-none">
+                  {LOCALE_FLAGS[value]}
+                </span>
+                <span>{LOCALE_LABELS[value]}</span>
               </li>
             );
           })}

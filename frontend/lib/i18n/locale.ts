@@ -20,3 +20,11 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   en: 'EN',
   ja: 'JA',
 };
+
+// Emoji flag fallback — used when locale-specific flag SVG assets are not
+// exported from Figma. Renders consistently across modern OSes.
+export const LOCALE_FLAGS: Record<Locale, string> = {
+  vi: '🇻🇳',
+  en: '🇬🇧',
+  ja: '🇯🇵',
+};

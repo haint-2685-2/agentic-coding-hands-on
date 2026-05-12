@@ -104,7 +104,7 @@ export function SecretBoxModal({
                   ? result.retryAfter
                   : 5;
               setRetryUntil(Date.now() + wait * 1000);
-              setBanner({ message: strings.errorRateLimited(wait) });
+              setBanner({ message: strings.errorRateLimited.replace('{n}', String(wait)) });
               break;
             }
             case 'auth/account-disabled':
@@ -243,7 +243,7 @@ export function SecretBoxModal({
         aria-atomic="true"
         className="sr-only"
       >
-        {lastBadge ? strings.fallbackBadgeAlt(lastBadge.name) : ''}
+        {lastBadge ? strings.fallbackBadgeAlt.replace('{name}', lastBadge.name) : ''}
       </div>
 
       {/* The interactive box / reveal area (node 1466:7684). */}
@@ -253,9 +253,13 @@ export function SecretBoxModal({
         isOpening={isOpening}
         remaining={unopenedCount}
         revealedBadge={lastBadge}
-        ariaLabel={strings.openButtonLabel(unopenedCount)}
+        ariaLabel={
+          unopenedCount > 0
+            ? strings.openButtonLabelAvailable.replace('{n}', String(unopenedCount))
+            : strings.openButtonLabelEmpty
+        }
         openingCaption={strings.openingCaption}
-        fallbackAlt={strings.fallbackBadgeAlt}
+        fallbackAlt={(name) => strings.fallbackBadgeAlt.replace('{name}', name)}
         onOpen={handleOpen}
       />
 
@@ -263,7 +267,7 @@ export function SecretBoxModal({
       {banner ? <ErrorToast message={banner.message} /> : null}
       {rateLimited && !banner ? (
         <ErrorToast
-          message={strings.errorRateLimited(retrySecondsRemaining)}
+          message={strings.errorRateLimited.replace('{n}', String(retrySecondsRemaining))}
         />
       ) : null}
 

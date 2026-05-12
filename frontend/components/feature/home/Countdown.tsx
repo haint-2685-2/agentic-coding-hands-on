@@ -102,7 +102,10 @@ export function Countdown({
         className="flex items-center gap-[24px] md:gap-[40px]"
       >
         <span className="sr-only">
-          {strings.countdownSummary(values.days, values.hours, values.minutes)}
+          {strings.countdownSummary
+            .replace('{d}', values.days)
+            .replace('{h}', values.hours)
+            .replace('{m}', values.minutes)}
         </span>
         <Tile value={values.days} label={strings.days} />
         <Tile value={values.hours} label={strings.hours} />
