@@ -1,0 +1,124 @@
+# Supabase local stack — pinned versions matching what `supabase start` provisions
+# for this project on 2026-05-11. Use either this file (manual control) OR
+# `supabase start` (recommended — CLI generates Kong routes and init SQL for you).
+#
+# DO NOT run both at the same time. They share port 54321/54322/54323 and Docker
+# network names.
+#
+# Local URLs (when started):
+#   API gateway          http://localhost:54321
+#   PostgreSQL           postgres://postgres:postgres@localhost:54322/postgres
+#   Supabase Studio      http://localhost:54323
+#   Mailpit (email test) http://localhost:54324
+#
+# NOTE on completeness:
+#   - DB + Studio + edge_runtime here are runnable as-is.
+#   - GoTrue (auth), Kong (gateway), Storage, PostgREST need extra config that
+#     the Supabase CLI generates on the fly (kong.yml, init.sql). For the exam
+#     project we keep using `supabase start`; this file documents the pinned
+#     image tags so production-style ops know exactly what's running.
+#
+# To recreate the full stack via the CLI:
+#   supabase start
+#   supabase db reset --no-seed     # apply migrations under supabase/migrations
+#   supabase functions serve --no-verify-jwt
+#
+# To bring up only the standalone bits (DB + Studio):
+#   docker compose up -d db studio
+
+name: saa-2025-server
+
+networks:
+  default:
+    name: supabase_network_saa-2025-server
+
+services:
+
+  db:
+    image: public.ecr.aws/supabase/postgres:17.6.1.106
+    container_name: supabase_db_saa-2025-server
+    restart: unless-stopped
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: supabase_admin
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_INITDB_ARGS: --allow-group-access --locale-provider=icu --encoding=UTF-8 --icu-locale=en_US.UTF-8
+      JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      JWT_EXP: 3600
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  studio:
+    image: public.ecr.aws/supabase/studio:2026.04.28-sha-89d08a2
+    container_name: supabase_studio_saa-2025-server
+    restart: unless-stopped
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: http://pg_meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: SAA 2025
+      DEFAULT_PROJECT_NAME: saa-2025-server
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_REST_URL: http://kong:8000/rest/v1
+      LOGFLARE_URL: http://analytics:4000
+      NEXT_PUBLIC_ENABLE_LOGS: "true"
+    depends_on:
+      - db
+      - pg_meta
+
+  pg_meta:
+    image: public.ecr.aws/supabase/postgres-meta:v0.96.4
+    container_name: supabase_pg_meta_saa-2025-server
+    restart: unless-stopped
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: supabase_admin
+      PG_META_DB_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+
+  edge_runtime:
+    image: public.ecr.aws/supabase/edge-runtime:v1.73.13
+    container_name: supabase_edge_runtime_saa-2025-server
+    restart: unless-stopped
+    environment:
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      SUPABASE_DB_URL: postgres://postgres:postgres@db:5432/postgres
+      VERIFY_JWT: "false"
+    volumes:
+      - ./supabase/functions:/home/deno/functions:ro
+    command: ["start", "--main-service", "/home/deno/functions/main", "--verbose"]
+    depends_on:
+      - db
+
+  inbucket:
+    image: public.ecr.aws/supabase/mailpit:v1.22.3
+    container_name: supabase_inbucket_saa-2025-server
+    restart: unless-stopped
+    ports:
+      - "54324:8025"
+
+  # NOTE: auth (GoTrue), rest (PostgREST), storage, kong, realtime, vector,
+  # analytics need a sizable amount of project-specific config (Kong route
+  # file, JWT keys, env etc.) that the Supabase CLI generates dynamically.
+  # The full canonical compose file lives at
+  # https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml
+  # if you need a complete standalone deployment.
+
+volumes:
+  db-data:
