@@ -28,6 +28,10 @@ export async function fetchMe(token: string): Promise<Me> {
     locale: isLocale(data.locale) ? data.locale : 'vi',
     role: data.role === 'admin' ? 'admin' : 'user',
     is_active: data.is_active !== false,
+    department_id:
+      typeof data.department_id === 'string' ? data.department_id : null,
+    department_name:
+      typeof data.department_name === 'string' ? data.department_name : null,
   };
 }
 
@@ -41,7 +45,7 @@ export async function patchLanguage(
   locale: 'vi' | 'en',
 ): Promise<{ ok: boolean }> {
   try {
-    const res = await fetch(endpoint('/me/language'), {
+    const res = await fetch(endpoint('/me-language'), {
       method: 'PATCH',
       headers: authHeaders(token),
       body: JSON.stringify({ locale }),

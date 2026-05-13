@@ -10,6 +10,8 @@ export type AppUser = {
   locale: 'vi' | 'en' | 'ja';
   role: 'user' | 'admin';
   is_active: boolean;
+  department_id: string | null;
+  department_name: string | null;
 };
 
 export type AuthContext = {
@@ -59,9 +61,14 @@ export async function requireUser(req: Request): Promise<AuthContext> {
     throw new AuthError(err(401, 'auth/invalid-token', 'Invalid or malformed token.'));
   }
   const svc = serviceClient();
+  // Embed the department row so callers can render `department_name` without
+  // an extra round-trip. PostgREST returns `department: { name }` when the FK
+  // is named or implicit; we explicitly alias to `department_name`.
   const { data: row, error: rowErr } = await svc
     .from('app_user')
-    .select('id, auth_user_id, email, full_name, avatar_url, locale, role, is_active')
+    .select(
+      'id, auth_user_id, email, full_name, avatar_url, locale, role, is_active, department_id, department:department_id ( name )',
+    )
     .eq('auth_user_id', data.user.id)
     .maybeSingle();
   if (rowErr || !row) {
@@ -70,5 +77,18 @@ export async function requireUser(req: Request): Promise<AuthContext> {
   if (!row.is_active) {
     throw new AuthError(err(403, 'auth/account-disabled', 'This account has been disabled.'));
   }
-  return { user: data.user, appUser: row as AppUser, jwt, supabase };
+  const dept = (row as unknown as { department: { name: string } | null }).department;
+  const appUser: AppUser = {
+    id: row.id,
+    auth_user_id: row.auth_user_id,
+    email: row.email,
+    full_name: row.full_name,
+    avatar_url: row.avatar_url,
+    locale: row.locale,
+    role: row.role,
+    is_active: row.is_active,
+    department_id: row.department_id,
+    department_name: dept?.name ?? null,
+  };
+  return { user: data.user, appUser, jwt, supabase };
 }

@@ -25,6 +25,7 @@ export function SubmitBar({
         onClick={onCancel}
         className="flex h-[60px] flex-row items-center justify-center gap-[8px] rounded-[4px] border border-saa-border bg-saa-kudo-button-soft px-[40px] py-[16px] font-montserrat text-[16px] font-bold text-saa-kudo-text hover:bg-[rgba(255,234,158,0.20)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-gold"
       >
+        Hủy
         <Image
           src="/assets/viet-kudo/icon-close.svg"
           alt=""
@@ -32,7 +33,6 @@ export function SubmitBar({
           width={20}
           height={20}
         />
-        Hủy
       </button>
       <button
         type="button"

@@ -91,7 +91,7 @@ function Leaderboard({ title, entries, emptyLabel }: LeaderboardProps) {
                   <Image
                     src={
                       entry.avatar_url ||
-                      '/assets/kudos-live-board/avatar-leaderboard.png'
+                      '/assets/kudos-live-board/default-avatar.svg'
                     }
                     alt=""
                     aria-hidden="true"

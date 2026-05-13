@@ -41,7 +41,7 @@ export function KudosPromo({ strings }: KudosPromoProps) {
             >
               <span>{strings.kudosCta}</span>
               <Image
-                src="/assets/homepage-saa/cta-arrow.svg"
+                src="/assets/homepage-saa/cta-arrow-dark.svg"
                 alt=""
                 aria-hidden="true"
                 width={24}

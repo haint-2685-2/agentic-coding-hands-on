@@ -100,6 +100,13 @@ be_up() {
     return
   fi
   echo "🚀 Booting Supabase stack from $BACKEND_DIR ..."
+  # `supabase start` substitutes ${VAR} in docker-compose from the shell env,
+  # not from supabase/.env.local (that file is only read by `functions serve`).
+  # Source it here so OAuth client_id/secret reach the auth container.
+  local env_file="$BACKEND_DIR/supabase/.env.local"
+  if [[ -f "$env_file" ]]; then
+    set -a; source "$env_file"; set +a
+  fi
   ( cd "$BACKEND_DIR" && supabase start )
   echo "   Studio   http://127.0.0.1:54323"
   echo "   Mailpit  http://127.0.0.1:54324"
@@ -157,12 +164,25 @@ fe_down() {
     fi
     rm -f "$FE_PID_FILE"
   fi
-  # Also reap any orphan listener on the port (e.g. started manually before the script existed).
+  # Reap any orphan listener on the script's primary port.
   local orphan
   orphan=$(lsof -ti:$FE_PORT 2>/dev/null || true)
   if [[ -n "$orphan" ]]; then
     echo "🛑 Killing orphan listener on port $FE_PORT (pid $orphan)"
     kill $orphan 2>/dev/null || true
+    stopped=1
+  fi
+  # Reap stragglers from previous boots: if port $FE_PORT was busy during
+  # `up fe`, Next.js silently falls back to 3001/3002/... and our PID file
+  # only tracks the latest invocation — older orphans on those ports leak.
+  # Sweep all user-owned `next dev` / `next-server` processes to make sure
+  # `up fe` after this can claim $FE_PORT cleanly.
+  local stragglers
+  stragglers=$(pgrep -u "$(id -u)" -f "next dev|next-server" 2>/dev/null || true)
+  if [[ -n "$stragglers" ]]; then
+    echo "🛑 Killing leftover Next.js processes: $(echo $stragglers | tr '\n' ' ')"
+    pkill -u "$(id -u)" -f "next dev" 2>/dev/null || true
+    pkill -u "$(id -u)" -f "next-server" 2>/dev/null || true
     stopped=1
   fi
   if [[ "$stopped" -eq 1 ]]; then

@@ -91,7 +91,7 @@ export function Countdown({
   const showLabel = !isStarted;
 
   return (
-    <div className="flex flex-col items-start gap-[16px]">
+    <div className="flex flex-col items-start gap-[20px]">
       {showLabel && (
         <p className="font-montserrat text-[20px] font-bold leading-[28px] text-white md:text-[24px] md:leading-[32px]">
           {strings.comingSoon}
@@ -99,7 +99,7 @@ export function Countdown({
       )}
       <time
         dateTime={eventStartAt ?? undefined}
-        className="flex items-center gap-[24px] md:gap-[40px]"
+        className="flex flex-row flex-nowrap items-start gap-[16px] md:gap-[28px]"
       >
         <span className="sr-only">
           {strings.countdownSummary
@@ -116,17 +116,48 @@ export function Countdown({
 }
 
 function Tile({ value, label }: { value: string; label: string }) {
+  const [d1, d2] = value.length === 2 ? [value[0], value[1]] : ['-', '-'];
   return (
     <div
       aria-hidden="true"
-      className="flex w-[88px] flex-col items-center gap-[8px] md:w-[116px]"
+      className="flex shrink-0 flex-col items-center gap-[12px]"
     >
-      <span className="font-montserrat text-[64px] font-bold leading-[1] text-saa-gold [text-shadow:0_4px_4px_rgba(0,0,0,0.25),0_0_6px_#FAE287] md:text-[96px]">
-        {value}
-      </span>
-      <span className="font-montserrat text-[12px] font-bold tracking-[0.5px] text-white md:text-[14px]">
+      <div className="flex flex-row flex-nowrap items-center gap-[8px] md:gap-[10px]">
+        <DigitCard char={d1} />
+        <DigitCard char={d2} />
+      </div>
+      <span className="font-montserrat text-[14px] font-bold uppercase tracking-[2px] text-white/80 md:text-[16px]">
         {label}
       </span>
     </div>
+  );
+}
+
+function DigitCard({ char }: { char: string }) {
+  return (
+    <span
+      className={[
+        // Layout: tile slightly taller than wide for a clean clock look.
+        'relative inline-flex h-[72px] w-[56px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] md:h-[92px] md:w-[72px]',
+        // Brushed-metal gradient + warm-gold top highlight + dark bottom inset.
+        'bg-[linear-gradient(180deg,#3a4148_0%,#262c33_45%,#13181d_55%,#0a0e12_100%)]',
+        'shadow-[inset_0_1px_0_rgba(255,234,158,0.35),inset_0_-1px_2px_rgba(0,0,0,0.7),0_2px_4px_rgba(0,0,0,0.45)]',
+        // Faint fold line across the middle (the flip-clock split).
+        'before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-1/2 before:h-px before:bg-black/55 before:content-[""]',
+      ].join(' ')}
+    >
+      <span
+        className="tabular-nums text-[38px] leading-[1] md:text-[52px]"
+        style={{
+          fontFamily:
+            'var(--font-digital), ui-sans-serif, system-ui, sans-serif',
+          fontWeight: 900,
+          color: 'rgba(255, 248, 220, 0.95)',
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {char}
+      </span>
+    </span>
   );
 }

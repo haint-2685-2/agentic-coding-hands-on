@@ -43,6 +43,8 @@ export interface Me {
   locale: Locale;
   role: 'user' | 'admin';
   is_active: boolean;
+  department_id: string | null;
+  department_name: string | null;
 }
 
 export interface UnreadCountResponse {

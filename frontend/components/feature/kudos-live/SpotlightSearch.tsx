@@ -8,9 +8,19 @@ interface SpotlightSearchProps {
   initialQuery: string;
   placeholder: string;
   onQuery: (q: string) => void;
+  /**
+   * `inline-pill` strips the search chrome (icon + outer border) — used when
+   * the parent already wraps the input in a styled pill (Spotlight overlay).
+   */
+  variant?: 'default' | 'inline-pill';
 }
 
-export function SpotlightSearch({ initialQuery, placeholder, onQuery }: SpotlightSearchProps) {
+export function SpotlightSearch({
+  initialQuery,
+  placeholder,
+  onQuery,
+  variant = 'default',
+}: SpotlightSearchProps) {
   const [value, setValue] = useState(initialQuery);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -23,6 +33,20 @@ export function SpotlightSearch({ initialQuery, placeholder, onQuery }: Spotligh
       if (timer.current) clearTimeout(timer.current);
     };
   }, [value, onQuery]);
+
+  if (variant === 'inline-pill') {
+    return (
+      <input
+        type="search"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={placeholder}
+        maxLength={100}
+        aria-label={placeholder}
+        className="w-[140px] bg-transparent font-montserrat text-[14px] text-white placeholder:text-white/80 focus:outline-none md:w-[180px]"
+      />
+    );
+  }
 
   return (
     <div className="flex h-[56px] w-full max-w-[440px] items-center gap-[8px] rounded-[68px] border border-saa-border bg-saa-kudo-button-soft px-[16px]">

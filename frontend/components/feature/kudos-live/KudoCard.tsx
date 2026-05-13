@@ -163,7 +163,7 @@ function UserBlock({ user, clickable }: UserBlockProps) {
     <>
       <div className="relative h-[64px] w-[64px] overflow-hidden rounded-full border-[1.869px] border-white bg-[#EEE]">
         <Image
-          src={user.avatar_url || '/assets/kudos-live-board/avatar-sender.png'}
+          src={user.avatar_url || '/assets/kudos-live-board/default-avatar.svg'}
           alt=""
           aria-hidden="true"
           fill

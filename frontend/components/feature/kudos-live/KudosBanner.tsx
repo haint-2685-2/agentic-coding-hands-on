@@ -18,7 +18,7 @@ export function KudosBanner({ strings }: KudosBannerProps) {
       className="flex w-full max-w-[1152px] flex-col items-start gap-[10px]"
     >
       <p className="font-montserrat text-[24px] font-bold leading-[32px] text-saa-gold md:text-[36px] md:leading-[44px]">
-        Hệ thống ghi nhận và cảm ơn
+        {strings.kvHeadline}
       </p>
       <Image
         src="/assets/kudos-live-board/kudos-logo.svg"

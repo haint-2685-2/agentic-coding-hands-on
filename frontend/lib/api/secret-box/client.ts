@@ -42,7 +42,7 @@ export async function getSecretBoxesCount(
   supabase: SupabaseClient,
   init?: { signal?: AbortSignal },
 ): Promise<SecretBoxesResponse> {
-  const res = await fetch(endpoint('/me/secret-boxes'), {
+  const res = await fetch(endpoint('/me-secret-boxes'), {
     method: 'GET',
     headers: await authHeader(supabase),
     cache: 'no-store',
@@ -72,7 +72,7 @@ export async function openSecretBox(
 ): Promise<OpenBoxResult> {
   let res: Response;
   try {
-    res = await fetch(endpoint('/me/secret-boxes/open'), {
+    res = await fetch(endpoint('/me-secret-boxes?action=open'), {
       method: 'POST',
       headers: await authHeader(supabase),
       // FE NEVER sends `badge_code`. Empty body, full stop (TR-007 / SC-004).

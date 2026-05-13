@@ -76,7 +76,7 @@ export async function createKudo(
   }
   let res: Response;
   try {
-    res = await fetch(endpoint('/kudos'), {
+    res = await fetch(endpoint('/kudos-create'), {
       method: 'POST',
       headers: authHeaders(token),
       cache: 'no-store',
@@ -133,7 +133,7 @@ export async function requestUploadUrl(
   }
   let res: Response;
   try {
-    res = await fetch(endpoint('/kudos/upload-url'), {
+    res = await fetch(endpoint('/kudos-upload-url'), {
       method: 'POST',
       headers: authHeaders(token),
       cache: 'no-store',

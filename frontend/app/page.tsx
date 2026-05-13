@@ -7,6 +7,7 @@ import { listAwards } from '@/lib/api/home/awards';
 import { getHomeStrings } from '@/lib/i18n/home';
 import { HomeHeader } from '@/components/feature/home/HomeHeader';
 import { Hero } from '@/components/feature/home/Hero';
+import { RootFurtherStory } from '@/components/feature/home/RootFurtherStory';
 import { AwardsGrid } from '@/components/feature/home/AwardsGrid';
 import { KudosPromo } from '@/components/feature/home/KudosPromo';
 import { HomeFooter } from '@/components/feature/home/HomeFooter';
@@ -54,6 +55,7 @@ export default async function HomePage() {
 
       <main className="relative z-10 flex flex-col items-center gap-[120px] px-6 pb-[120px] pt-[184px] lg:px-[144px]">
         <Hero eventConfig={eventConfig} strings={strings} />
+        <RootFurtherStory />
         <AwardsGrid awards={awards} strings={strings} error={awardsError} />
         <KudosPromo strings={strings} />
       </main>

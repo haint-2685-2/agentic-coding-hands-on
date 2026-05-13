@@ -2,6 +2,7 @@ import type { AwardDetail } from '@/lib/api/awards/types';
 import type { AwardsStrings } from '@/lib/i18n/awards';
 import { EligibilityList } from './EligibilityList';
 import { PrizeMoneyDisplay } from './PrizeMoneyDisplay';
+import { TargetIcon } from './Icons';
 
 interface AwardDetailPanelProps {
   award: AwardDetail;
@@ -20,10 +21,7 @@ export function AwardDetailPanel({ award, strings }: AwardDetailPanelProps) {
     <div className="flex w-full max-w-[480px] flex-col gap-[32px]">
       <div className="flex flex-col gap-[24px]">
         <div className="flex items-center gap-[16px]">
-          <span
-            aria-hidden="true"
-            className="inline-block h-[24px] w-[24px] flex-shrink-0 rounded-sm bg-saa-gold/30"
-          />
+          <TargetIcon className="h-[24px] w-[24px] flex-shrink-0 text-saa-gold" />
           <h2
             id={titleId}
             className="font-montserrat text-[24px] font-bold leading-[32px] text-saa-gold"

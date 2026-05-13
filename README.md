@@ -12,6 +12,8 @@ saa-2025/
 Cả hai layer **share cùng 1 git repo** (monorepo) và cùng 1 MoMorph project
 (`fileKey = 9ypp4enmFmdK3YAFJLIu6C`).
 
+> **Deploy lên public** (Supabase Cloud + Vercel) → [docs/deploy.md](./docs/deploy.md)
+
 ---
 
 ## Layer hiện tại

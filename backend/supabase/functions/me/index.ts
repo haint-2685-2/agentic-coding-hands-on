@@ -28,6 +28,8 @@ serve(async (req) => {
       locale: ctx.appUser.locale,
       role: ctx.appUser.role,
       is_active: ctx.appUser.is_active,
+      department_id: ctx.appUser.department_id,
+      department_name: ctx.appUser.department_name,
     });
     logEvent({
       fn: 'me',

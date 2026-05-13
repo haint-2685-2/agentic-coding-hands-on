@@ -48,9 +48,9 @@ export interface KudosStrings {
 
 const vi: KudosStrings = {
   pageTitle: 'Sun* Kudos',
-  kvHeadline: 'Sun* Kudos',
+  kvHeadline: 'Hệ thống ghi nhận và cảm ơn',
   kvSubline: 'Trao gửi sự ghi nhận và yêu thương đến đồng nghiệp.',
-  quickInputPlaceholder: 'Hôm nay, bạn muốn gửi lời cảm ơn tới ai?',
+  quickInputPlaceholder: 'Hôm nay, bạn muốn gửi lời cảm ơn và ghi nhận đến ai?',
   highlightTitle: 'Highlight',
   hashtagAll: 'Tất cả hashtag',
   departmentAll: 'Tất cả phòng ban',
@@ -77,14 +77,14 @@ const vi: KudosStrings = {
   prevSlide: 'Slide trước',
   nextSlide: 'Slide kế',
   sidebarStatsTitle: 'Thống kê',
-  sidebarReceived: 'Kudos nhận',
-  sidebarSent: 'Kudos gửi',
-  sidebarHearts: 'Hearts',
-  sidebarBoxesOpened: 'Hộp đã mở',
-  sidebarBoxesPending: 'Hộp chờ mở',
+  sidebarReceived: 'Số Kudos bạn nhận được:',
+  sidebarSent: 'Số Kudos bạn đã gửi:',
+  sidebarHearts: 'Số tim bạn nhận được:',
+  sidebarBoxesOpened: 'Số Secret Box bạn đã mở:',
+  sidebarBoxesPending: 'Số Secret Box bạn chưa mở:',
   sidebarOpenBox: 'Mở quà',
-  sidebarLeaderboardSenders: 'Top người gửi',
-  sidebarLeaderboardReceivers: 'Top người nhận',
+  sidebarLeaderboardSenders: 'Top người gửi Kudos',
+  sidebarLeaderboardReceivers: 'Top người nhận Kudos',
   sidebarEmpty: 'Chưa có dữ liệu',
   rateLimited: 'Bạn thao tác quá nhanh, thử lại sau.',
   loadError: 'Không tải được dữ liệu.',
@@ -94,7 +94,7 @@ const vi: KudosStrings = {
 
 const en: KudosStrings = {
   pageTitle: 'Sun* Kudos',
-  kvHeadline: 'Sun* Kudos',
+  kvHeadline: 'Recognition & gratitude board',
   kvSubline: 'Send appreciation and love to your colleagues.',
   quickInputPlaceholder: 'Who would you like to thank today?',
   highlightTitle: 'Highlight',
@@ -140,7 +140,7 @@ const en: KudosStrings = {
 
 const ja: KudosStrings = {
   pageTitle: 'Sun* Kudos',
-  kvHeadline: 'Sun* Kudos',
+  kvHeadline: '感謝と称賛のシステム',
   kvSubline: '同僚への感謝と称賛を届けましょう。',
   quickInputPlaceholder: '今日は誰に「ありがとう」を伝えたいですか？',
   highlightTitle: 'Highlight',

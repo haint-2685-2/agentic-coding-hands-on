@@ -1,5 +1,6 @@
 import { formatVnd } from '@/lib/format/vnd';
 import type { AwardsStrings } from '@/lib/i18n/awards';
+import { LicenseIcon } from './Icons';
 
 interface PrizeMoneyDisplayProps {
   valueVnd: number;
@@ -25,10 +26,7 @@ export function PrizeMoneyDisplay({
     <div className="flex w-full flex-col gap-[24px]">
       <div className="flex w-full flex-col gap-[16px]">
         <div className="flex items-center gap-[16px]">
-          <span
-            aria-hidden="true"
-            className="inline-block h-[24px] w-[24px] flex-shrink-0 rounded-full bg-saa-gold/30"
-          />
+          <LicenseIcon className="h-[24px] w-[24px] flex-shrink-0 text-saa-gold" />
           <span className="font-montserrat text-[24px] font-bold leading-[32px] text-saa-gold">
             {strings.valueLabel}
           </span>

@@ -88,7 +88,7 @@ export function FloatingWidget({ strings }: FloatingWidgetProps) {
         className="flex h-[64px] items-center gap-[8px] rounded-full bg-saa-cta px-[24px] py-[16px] font-montserrat text-[14px] font-bold text-saa-cta-foreground shadow-[0_4px_4px_rgba(0,0,0,0.25),0_0_6px_#FAE287] outline-none transition-transform hover:-translate-y-[1px] focus-visible:ring-2 focus-visible:ring-saa-gold"
       >
         <Image
-          src="/assets/homepage-saa/widget-pen.svg"
+          src="/assets/homepage-saa/widget-pen-dark.svg"
           alt=""
           aria-hidden="true"
           width={24}

@@ -20,7 +20,7 @@ export interface SecretBoxStrings {
 const vi: SecretBoxStrings = {
   modalTitle: 'KHÁM PHÁ SECRET BOX CỦA BẠN',
   modalAriaLabel: 'Cửa sổ mở secret box',
-  instruction: 'Click vào box để mở',
+  instruction: 'Click vào box để tiếp tục mở',
   counterLabel: 'Secretbox chưa mở',
   openButtonLabelAvailable: 'Mở Secret Box (còn {n})',
   openButtonLabelEmpty: 'Mở Secret Box (đã hết)',
@@ -37,7 +37,7 @@ const vi: SecretBoxStrings = {
 const en: SecretBoxStrings = {
   modalTitle: 'DISCOVER YOUR SECRET BOX',
   modalAriaLabel: 'Open secret box dialog',
-  instruction: 'Click the box to open',
+  instruction: 'Click the box to keep opening',
   counterLabel: 'Unopened secret boxes',
   openButtonLabelAvailable: 'Open a secret box ({n} remaining)',
   openButtonLabelEmpty: 'Open a secret box (none remaining)',

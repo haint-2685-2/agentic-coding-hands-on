@@ -5,6 +5,7 @@ import type { HomeStrings } from '@/lib/i18n/home';
 import type { Locale } from '@/lib/i18n/locale';
 import type { Me } from '@/lib/api/home/types';
 import { LanguagePicker } from '@/components/feature/login/LanguagePicker';
+import { HeaderNav } from './HeaderNav';
 
 // Auth-aware surfaces are dynamically imported and only mounted when `me`
 // is set, so anonymous bundles never pay for them.
@@ -48,16 +49,13 @@ export function HomeHeader({ locale, strings, me }: HomeHeaderProps) {
             className="h-[48px] w-[52px] object-cover"
           />
         </Link>
-        <nav
-          aria-label="Primary"
-          className="hidden h-[56px] items-center gap-[24px] md:flex"
-        >
-          <HeaderNavLink href="/" selected>
-            {strings.navAbout}
-          </HeaderNavLink>
-          <HeaderNavLink href="/awards">{strings.navAwards}</HeaderNavLink>
-          <HeaderNavLink href="/kudos">{strings.navKudos}</HeaderNavLink>
-        </nav>
+        <HeaderNav
+          labels={{
+            about: strings.navAbout,
+            awards: strings.navAwards,
+            kudos: strings.navKudos,
+          }}
+        />
       </div>
 
       <div className="flex h-[56px] items-center gap-[16px]">
@@ -78,30 +76,5 @@ export function HomeHeader({ locale, strings, me }: HomeHeaderProps) {
         )}
       </div>
     </header>
-  );
-}
-
-function HeaderNavLink({
-  href,
-  selected,
-  children,
-}: {
-  href: string;
-  selected?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={[
-        'flex h-[52px] items-center px-[16px] font-montserrat text-[14px] font-bold leading-[20px] tracking-[0.1px] transition-colors',
-        selected
-          ? 'border-b-2 border-saa-gold text-saa-gold [text-shadow:0_0_6px_#FAE287]'
-          : 'text-white/90 hover:text-saa-gold focus-visible:text-saa-gold',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-gold/60 rounded-[4px]',
-      ].join(' ')}
-    >
-      {children}
-    </Link>
   );
 }

@@ -15,7 +15,7 @@ export async function getUnreadCount(
   token: string,
   init?: { signal?: AbortSignal },
 ): Promise<UnreadCountResponse> {
-  const res = await fetch(endpoint('/me/notifications/unread-count'), {
+  const res = await fetch(endpoint('/me-notifications?count=true'), {
     method: 'GET',
     headers: authHeaders(token),
     cache: 'no-store',
@@ -37,8 +37,8 @@ export async function listNotifications(
   init?: { signal?: AbortSignal },
 ): Promise<NotificationsListResponse> {
   const url = before
-    ? endpoint(`/me/notifications?limit=20&before=${encodeURIComponent(before)}`)
-    : endpoint('/me/notifications?limit=20');
+    ? endpoint(`/me-notifications?limit=20&before=${encodeURIComponent(before)}`)
+    : endpoint('/me-notifications?limit=20');
   const res = await fetch(url, {
     method: 'GET',
     headers: authHeaders(token),
@@ -61,7 +61,7 @@ export async function markNotificationRead(
   token: string,
   id: string,
 ): Promise<{ ok: boolean }> {
-  const res = await fetch(endpoint(`/me/notifications/${encodeURIComponent(id)}`), {
+  const res = await fetch(endpoint(`/me-notifications-id?id=${encodeURIComponent(id)}`), {
     method: 'PATCH',
     headers: authHeaders(token),
     body: JSON.stringify({ read: true }),
@@ -73,7 +73,7 @@ export async function markNotificationRead(
 export async function markAllNotificationsRead(
   token: string,
 ): Promise<{ ok: boolean; updated: number }> {
-  const res = await fetch(endpoint('/me/notifications/mark-all-read'), {
+  const res = await fetch(endpoint('/me-notifications?action=mark-all-read'), {
     method: 'POST',
     headers: authHeaders(token),
     body: '{}',

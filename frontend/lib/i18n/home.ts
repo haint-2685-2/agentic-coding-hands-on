@@ -17,6 +17,8 @@ export interface HomeStrings {
   minutes: string;
   countdownSummary: string;
   // Event info
+  eventTimeLabel: string;
+  eventLocationLabel: string;
   eventTimeFallback: string;
   eventLocationFallback: string;
   broadcastNoteFallback: string;
@@ -64,11 +66,13 @@ const vi: HomeStrings = {
   hours: 'HOURS',
   minutes: 'MINUTES',
   countdownSummary: 'Còn {d} ngày {h} giờ {m} phút',
+  eventTimeLabel: 'Thời gian',
+  eventLocationLabel: 'Địa điểm',
   eventTimeFallback: '18h30 · 20/12/2025',
   eventLocationFallback: 'Sun* HQ, Hà Nội',
   broadcastNoteFallback: 'Livestream trên Sun* Workplace',
-  ctaAwards: 'ABOUT AWARDS',
-  ctaKudos: 'ABOUT KUDOS',
+  ctaAwards: 'VỀ GIẢI THƯỞNG',
+  ctaKudos: 'VỀ KUDOS',
   awardsSectionTitle: 'Hệ thống giải thưởng',
   awardsSectionSubtitle: '6 hạng mục danh giá vinh danh những Sun-er xuất sắc nhất năm 2025.',
   awardsEmpty: 'Sắp công bố',
@@ -105,6 +109,8 @@ const en: HomeStrings = {
   hours: 'HOURS',
   minutes: 'MINUTES',
   countdownSummary: '{d} days {h} hours {m} minutes remaining',
+  eventTimeLabel: 'Time',
+  eventLocationLabel: 'Location',
   eventTimeFallback: '6:30 PM · 20 Dec 2025',
   eventLocationFallback: 'Sun* HQ, Hanoi',
   broadcastNoteFallback: 'Livestream on Sun* Workplace',
@@ -146,11 +152,13 @@ const ja: HomeStrings = {
   hours: 'HOURS',
   minutes: 'MINUTES',
   countdownSummary: '残り {d} 日 {h} 時間 {m} 分',
+  eventTimeLabel: '日時',
+  eventLocationLabel: '会場',
   eventTimeFallback: '18:30 · 2025年12月20日',
   eventLocationFallback: 'Sun* HQ、ハノイ',
   broadcastNoteFallback: 'Sun* Workplace でライブ配信',
-  ctaAwards: 'ABOUT AWARDS',
-  ctaKudos: 'ABOUT KUDOS',
+  ctaAwards: '賞について',
+  ctaKudos: 'KUDOS について',
   awardsSectionTitle: '賞のカテゴリー',
   awardsSectionSubtitle: '2025年で最も活躍した Sun-er を称える 6 つの名誉ある賞。',
   awardsEmpty: '近日公開',

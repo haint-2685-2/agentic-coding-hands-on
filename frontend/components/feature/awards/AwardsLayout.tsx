@@ -22,7 +22,11 @@ export function AwardsLayout({ awards, strings }: AwardsLayoutProps) {
   return (
     <section
       aria-label={strings.navAriaLabel}
-      className="flex w-full max-w-[1152px] flex-col gap-[40px] md:flex-row md:items-start md:gap-[80px]"
+      // NOTE on `md:items-stretch`: needed so the left-rail wrapper grows to
+      // the section's full height. The nav inside uses `sticky top-...` and
+      // sticky elements only stick *within* their containing block — a short
+      // wrapper has no scroll range and unsticks immediately.
+      className="flex w-full max-w-[1152px] flex-col gap-[40px] md:flex-row md:items-stretch md:gap-[80px]"
     >
       <div className="md:w-[178px] md:flex-shrink-0">
         <LeftRailNav items={navItems} strings={strings} />
@@ -35,6 +39,9 @@ export function AwardsLayout({ awards, strings }: AwardsLayoutProps) {
             award={award}
             strings={strings}
             isLast={idx === awards.length - 1}
+            // Figma `D.x`: cards alternate — picture left for 1st/3rd/5th
+            // (idx 0,2,4 → even), picture right for 2nd/4th/6th.
+            reverse={idx % 2 === 1}
           />
         ))}
       </div>

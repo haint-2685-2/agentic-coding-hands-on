@@ -40,16 +40,20 @@ export function Hero({ eventConfig, strings }: HeroProps) {
           strings={strings}
         />
 
-        <dl className="mt-[16px] flex flex-col gap-[8px] font-montserrat text-[16px] font-bold leading-[24px] tracking-[0.5px] text-white">
-          <div className="flex flex-wrap items-center gap-x-[60px] gap-y-[8px]">
-            <dt className="sr-only">Time</dt>
-            <dd>{eventTimeLabel}</dd>
-            <dt className="sr-only">Location</dt>
-            <dd>{eventLocation}</dd>
+        <dl className="mt-[16px] flex flex-col gap-[8px] font-montserrat text-[16px] leading-[24px] tracking-[0.5px] text-white">
+          <div className="flex flex-wrap items-center gap-x-[40px] gap-y-[8px]">
+            <div className="inline-flex items-baseline gap-[6px]">
+              <dt className="font-medium text-white/80">{strings.eventTimeLabel}:</dt>
+              <dd className="font-bold">{eventTimeLabel}</dd>
+            </div>
+            <div className="inline-flex items-baseline gap-[6px]">
+              <dt className="font-medium text-white/80">{strings.eventLocationLabel}:</dt>
+              <dd className="font-bold">{eventLocation}</dd>
+            </div>
           </div>
           <div>
             <dt className="sr-only">Broadcast</dt>
-            <dd>{broadcastNote}</dd>
+            <dd className="font-bold">{broadcastNote}</dd>
           </div>
         </dl>
       </div>
@@ -61,7 +65,7 @@ export function Hero({ eventConfig, strings }: HeroProps) {
         >
           <span>{strings.ctaAwards}</span>
           <Image
-            src="/assets/homepage-saa/cta-arrow.svg"
+            src="/assets/homepage-saa/cta-arrow-dark.svg"
             alt=""
             aria-hidden="true"
             width={24}

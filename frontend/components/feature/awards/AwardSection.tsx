@@ -7,6 +7,12 @@ interface AwardSectionProps {
   award: AwardDetail;
   strings: AwardsStrings;
   isLast: boolean;
+  /**
+   * When true, render picture on the RIGHT (text on the left) — used by
+   * `AwardsLayout` to alternate every other card per the Figma `D.x` zigzag.
+   * Mobile collapses to a single column where picture always appears first.
+   */
+  reverse?: boolean;
 }
 
 /**
@@ -15,7 +21,12 @@ interface AwardSectionProps {
  * `<section data-award-slug>` + `<article aria-labelledby>` for proper a11y
  * landmark + heading association.
  */
-export function AwardSection({ award, strings, isLast }: AwardSectionProps) {
+export function AwardSection({
+  award,
+  strings,
+  isLast,
+  reverse = false,
+}: AwardSectionProps) {
   return (
     <section
       id={award.slug}
@@ -23,7 +34,12 @@ export function AwardSection({ award, strings, isLast }: AwardSectionProps) {
       aria-labelledby={`${award.slug}-title`}
       className="scroll-mt-[120px] w-full"
     >
-      <article className="flex w-full flex-col gap-[40px] md:flex-row md:items-start">
+      <article
+        className={[
+          'flex w-full flex-col gap-[40px] md:items-start md:gap-[80px]',
+          reverse ? 'md:flex-row-reverse' : 'md:flex-row',
+        ].join(' ')}
+      >
         <AwardPicture slug={award.slug} title={award.title} />
         <AwardDetailPanel award={award} strings={strings} />
       </article>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Montserrat, Montserrat_Alternates } from "next/font/google";
+import { Montserrat, Montserrat_Alternates, Orbitron } from "next/font/google";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -28,6 +28,16 @@ const montserratAlternates = Montserrat_Alternates({
   display: "swap",
 });
 
+// Modern futuristic display font for the homepage countdown tiles.
+// Orbitron has a clean geometric look that reads as a digital readout
+// without the dated pixel/CRT feel.
+const digitalFont = Orbitron({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  variable: "--font-digital",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Sun* Annual Awards 2025",
   description: "SAA 2025 — Sun* Kudos & Annual Awards",
@@ -46,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${montserratAlternates.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${montserratAlternates.variable} ${digitalFont.variable} antialiased`}
       >
         {children}
         {modal}

@@ -7,7 +7,7 @@ import { anonHeaders, endpoint } from './endpoint';
  */
 export async function getEventConfig(): Promise<EventConfig> {
   try {
-    const res = await fetch(endpoint('/config/event'), {
+    const res = await fetch(endpoint('/config-event'), {
       method: 'GET',
       headers: anonHeaders(),
       // Matches BE Cache-Control: public, max-age=60.

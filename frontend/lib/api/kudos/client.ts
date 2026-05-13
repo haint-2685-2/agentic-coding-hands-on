@@ -133,7 +133,7 @@ export async function listHighlights(
   });
   const result = await get<Partial<HighlightsResponse>>(
     supabase,
-    `/kudos/highlights${q}`,
+    `/kudos-highlights${q}`,
     init,
   );
   if (!result.ok) return result;
@@ -164,7 +164,7 @@ export async function getSpotlight(
   const query = buildQuery({ q: args.q });
   let res: Response;
   try {
-    res = await fetch(endpoint(`/kudos/spotlight${query}`), {
+    res = await fetch(endpoint(`/kudos-spotlight${query}`), {
       method: 'GET',
       headers: authHeaders(token),
       cache: 'no-store',
@@ -198,7 +198,7 @@ export async function getKudosStats(
   supabase: SupabaseClient,
   init?: { signal?: AbortSignal },
 ): Promise<ApiResult<KudosStats>> {
-  const result = await get<Partial<KudosStats>>(supabase, '/kudos/stats', init);
+  const result = await get<Partial<KudosStats>>(supabase, '/kudos-stats', init);
   if (!result.ok) return result;
   const d = result.data;
   return {
@@ -265,7 +265,7 @@ export async function toggleLike(
   const method = currentLiked ? 'DELETE' : 'POST';
   let res: Response;
   try {
-    res = await fetch(endpoint(`/kudos/${id}/like`), {
+    res = await fetch(endpoint(`/kudos-like?id=${encodeURIComponent(id)}`), {
       method,
       headers: authHeaders(token),
       cache: 'no-store',

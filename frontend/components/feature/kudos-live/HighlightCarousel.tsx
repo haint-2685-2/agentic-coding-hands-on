@@ -39,7 +39,17 @@ export function HighlightCarousel({ initial, locale, strings }: HighlightCarouse
 
   // Re-fetch on filter change. Skip the initial mount when filters are empty
   // (RSC already provided the data).
+  //
+  // `likes` is intentionally NOT a dep: the `LikesProvider` value memoises on
+  // `state` so any heart toggle would otherwise refire this effect, re-fetch
+  // highlights, and reset `active` to 0 (the "next slide bug"). We capture the
+  // `seed` method through a ref so we always invoke the latest one without
+  // taking a dep on the context value object.
   const firstMount = useRef(true);
+  const seedRef = useRef(likes.seed);
+  useEffect(() => {
+    seedRef.current = likes.seed;
+  });
   useEffect(() => {
     if (firstMount.current && !filters.hashtag && !filters.department) {
       firstMount.current = false;
@@ -55,12 +65,12 @@ export function HighlightCarousel({ initial, locale, strings }: HighlightCarouse
       if (controller.signal.aborted) return;
       if (res.ok) {
         setItems(res.data.items);
-        likes.seed(res.data.items);
+        seedRef.current(res.data.items);
         setActive(0);
       }
     })();
     return () => controller.abort();
-  }, [filters, likes]);
+  }, [filters]);
 
   // Auto-rotate when not paused and tab visible.
   useEffect(() => {

@@ -30,7 +30,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <main className="relative flex min-h-screen w-full flex-col items-start px-[144px] pb-[160px] pt-[184px]">
         <div className="flex w-full max-w-[1152px] flex-1 flex-col items-start justify-center gap-[80px]">
           <KeyVisual />
-          <div className="flex w-full max-w-[496px] flex-col items-start gap-[24px] pl-[16px]">
+          <div className="flex w-full max-w-[496px] flex-col items-center gap-[24px]">
             <HeroCopy line1={strings.heroLine1} line2={strings.heroLine2} />
             {errorCode ? <ErrorBanner code={errorCode} locale={locale} /> : null}
             <GoogleLoginButton

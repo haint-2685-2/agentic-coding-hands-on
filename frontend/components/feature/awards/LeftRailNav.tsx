@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { AwardsStrings } from '@/lib/i18n/awards';
+import { TargetIcon } from './Icons';
 
 interface NavItem {
   slug: string;
@@ -31,47 +32,76 @@ export function LeftRailNav({ items, strings }: LeftRailNavProps) {
   );
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // Scroll-spy via IntersectionObserver. Top-rooted so we pick the section
-  // whose top edge is just below the header.
+  // Scroll-spy: highlight the section whose top edge is just above the
+  // sticky header. Pure IntersectionObserver was unreliable for tall sections
+  // — when a section's top scrolls way off-screen but its bottom is still in
+  // view, IO still reports it as intersecting and we'd lock onto it. Mix
+  // IO (cheap "is anything visible?" hint) with a rAF-throttled scroll
+  // handler that picks the section with the largest top ≤ HEADER_OFFSET.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (typeof IntersectionObserver === 'undefined') return;
 
     const sections = items
       .map((it) => document.getElementById(it.slug))
       .filter((el): el is HTMLElement => el !== null);
     if (sections.length === 0) return;
 
+    const HEADER_OFFSET = 120;
     let lastActive = activeSlug;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Pick the entry closest to the top of the viewport that is at
-        // least partially visible — robust to fast scrolls.
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) {
-          const next = visible[0].target.id;
-          if (next && next !== lastActive) {
-            lastActive = next;
-            setActiveSlug(next);
-            try {
-              window.history.replaceState(null, '', `#${next}`);
-            } catch {
-              // history API may throw in restricted contexts; ignore.
-            }
-          }
-        }
-      },
-      {
-        // Account for sticky page header (80px) + small breathing room.
-        rootMargin: '-120px 0px -60% 0px',
-        threshold: [0, 0.1, 0.25, 0.5],
-      },
-    );
 
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+    function pickActive() {
+      let activeId: string | null = null;
+      let bestTop = -Infinity;
+      for (const sec of sections) {
+        const top = sec.getBoundingClientRect().top;
+        // Section has scrolled past the header — candidate for active.
+        // Keep the one closest to the header (largest top still ≤ offset).
+        if (top - HEADER_OFFSET <= 0 && top > bestTop) {
+          bestTop = top;
+          activeId = sec.id;
+        }
+      }
+      // None scrolled past yet (we're above the first one) → use the first.
+      if (activeId === null) activeId = sections[0].id;
+      if (activeId !== lastActive) {
+        lastActive = activeId;
+        setActiveSlug(activeId);
+        try {
+          window.history.replaceState(null, '', `#${activeId}`);
+        } catch {
+          // ignored — restricted contexts (sandboxed iframes etc.)
+        }
+      }
+    }
+
+    pickActive(); // initial fire
+
+    let rafId = 0;
+    function onScroll() {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        pickActive();
+        rafId = 0;
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    // IO acts as a safety net: any time *any* section enters/exits the
+    // viewport, re-pick. Covers in-page anchor jumps that don't fire
+    // 'scroll' immediately.
+    const observer =
+      typeof IntersectionObserver !== 'undefined'
+        ? new IntersectionObserver(() => pickActive(), { threshold: [0, 1] })
+        : null;
+    if (observer) sections.forEach((s) => observer.observe(s));
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      observer?.disconnect();
+    };
   }, [items, activeSlug]);
 
   // Activate from initial hash on mount (defensive — invalid hash falls
@@ -127,11 +157,10 @@ export function LeftRailNav({ items, strings }: LeftRailNavProps) {
                   'md:w-full md:whitespace-normal',
                 ].join(' ')}
               >
-                <span
-                  aria-hidden="true"
+                <TargetIcon
                   className={[
-                    'inline-block h-[24px] w-[24px] flex-shrink-0 rounded-sm',
-                    isActive ? 'bg-saa-gold/40' : 'bg-white/20',
+                    'h-[24px] w-[24px] flex-shrink-0',
+                    isActive ? 'text-saa-gold' : 'text-white/70',
                   ].join(' ')}
                 />
                 <span>{it.title}</span>

@@ -1,5 +1,6 @@
 import type { AwardDetail } from '@/lib/api/awards/types';
 import type { AwardsStrings } from '@/lib/i18n/awards';
+import { DiamondIcon } from './Icons';
 
 interface EligibilityListProps {
   award: Pick<AwardDetail, 'quantity' | 'unit_type'>;
@@ -16,10 +17,7 @@ export function EligibilityList({ award, strings }: EligibilityListProps) {
 
   return (
     <div className="flex w-full items-center gap-[16px]">
-      <span
-        aria-hidden="true"
-        className="inline-block h-[24px] w-[24px] flex-shrink-0 rounded-sm bg-saa-gold/30"
-      />
+      <DiamondIcon className="h-[24px] w-[24px] flex-shrink-0 text-saa-gold" />
       <span className="font-montserrat text-[24px] font-bold leading-[32px] text-saa-gold">
         {strings.quantityLabel}
       </span>
