@@ -10,12 +10,14 @@ interface HeroProps {
 }
 
 export function Hero({ eventConfig, strings }: HeroProps) {
-  const eventTimeLabel =
-    eventConfig.event_time_label || strings.eventTimeFallback;
-  const eventLocation =
-    eventConfig.event_location || strings.eventLocationFallback;
-  const broadcastNote =
-    eventConfig.broadcast_note || strings.broadcastNoteFallback;
+  // Display strings live in `home.ts` per locale. The DB row still owns the
+  // canonical `event_start_at` timestamp (used by the countdown logic), but
+  // the human-readable label/location/broadcast are i18n'd from FE so all 3
+  // locales see translated copy. Admins editing the DB strings is a no-op
+  // for display until/unless event_config grows locale-aware columns.
+  const eventTimeLabel = strings.eventTimeFallback;
+  const eventLocation = strings.eventLocationFallback;
+  const broadcastNote = strings.broadcastNoteFallback;
 
   return (
     <section

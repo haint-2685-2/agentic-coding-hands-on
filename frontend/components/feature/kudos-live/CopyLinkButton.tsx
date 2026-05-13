@@ -8,9 +8,15 @@ import type { KudosStrings } from '@/lib/i18n/kudos';
 interface CopyLinkButtonProps {
   kudoId: string;
   strings: KudosStrings;
+  /** When true, button renders as inert/disabled visual. */
+  disabled?: boolean;
 }
 
-export function CopyLinkButton({ kudoId, strings }: CopyLinkButtonProps) {
+export function CopyLinkButton({
+  kudoId,
+  strings,
+  disabled = false,
+}: CopyLinkButtonProps) {
   const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(
     null,
   );
@@ -58,9 +64,17 @@ export function CopyLinkButton({ kudoId, strings }: CopyLinkButtonProps) {
     <div className="relative inline-flex">
       <button
         type="button"
-        onClick={onClick}
+        onClick={disabled ? undefined : onClick}
+        disabled={disabled}
+        aria-disabled={disabled}
         aria-label={strings.cardCopyLink}
-        className="inline-flex h-[56px] min-w-[56px] items-center gap-[4px] rounded-[4px] px-[16px] py-[16px] font-montserrat text-[14px] font-bold text-saa-kudo-text transition-colors hover:bg-[rgba(0,16,26,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-kudo-text/40"
+        title={disabled ? 'Tạm khoá' : strings.cardCopyLink}
+        className={[
+          'inline-flex h-[56px] min-w-[56px] items-center gap-[4px] rounded-[4px] px-[16px] py-[16px] font-montserrat text-[14px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-kudo-text/40',
+          disabled
+            ? 'cursor-not-allowed text-saa-kudo-text/40'
+            : 'text-saa-kudo-text hover:bg-[rgba(0,16,26,0.05)]',
+        ].join(' ')}
       >
         <span className="hidden md:inline">{strings.cardCopyLink}</span>
         <Image
@@ -69,7 +83,7 @@ export function CopyLinkButton({ kudoId, strings }: CopyLinkButtonProps) {
           aria-hidden="true"
           width={24}
           height={24}
-          className="h-[24px] w-[24px]"
+          className={['h-[24px] w-[24px]', disabled ? 'opacity-40' : ''].join(' ')}
         />
       </button>
       {toast && (

@@ -55,7 +55,7 @@ export default async function HomePage() {
 
       <main className="relative z-10 flex flex-col items-center gap-[120px] px-6 pb-[120px] pt-[184px] lg:px-[144px]">
         <Hero eventConfig={eventConfig} strings={strings} />
-        <RootFurtherStory />
+        <RootFurtherStory strings={strings} />
         <AwardsGrid awards={awards} strings={strings} error={awardsError} />
         <KudosPromo strings={strings} />
       </main>

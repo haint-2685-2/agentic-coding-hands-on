@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { readLocaleFromCookies } from '@/lib/auth/locale-cookie';
 import { getOptionalMe } from '@/lib/auth/optional-session';
-import { getHomeStrings } from '@/lib/i18n/home';
+import { getHomeStrings, type HomeStrings } from '@/lib/i18n/home';
 import type { Me } from '@/lib/api/home/types';
 import { HomeHeader } from '@/components/feature/home/HomeHeader';
 import { HomeFooter } from '@/components/feature/home/HomeFooter';
@@ -41,16 +41,16 @@ export default async function ProfilePage() {
       <main className="relative z-10 mx-auto flex w-full max-w-[1024px] flex-col gap-[40px] px-6 pb-[120px] pt-[160px] lg:px-[80px]">
         <header className="flex flex-col gap-[8px]">
           <p className="font-montserrat text-[14px] font-medium uppercase tracking-[2px] text-saa-gold/70">
-            Sun&#42; Annual Awards 2025
+            {strings.profileSubtitle}
           </p>
           <h1 className="font-montserrat text-[36px] font-bold leading-[44px] text-white md:text-[48px] md:leading-[56px]">
             {strings.menuProfile}
           </h1>
         </header>
 
-        <HeroCard me={me} />
+        <HeroCard me={me} strings={strings} />
 
-        <DetailCard me={me} />
+        <DetailCard me={me} strings={strings} />
       </main>
 
       <HomeFooter strings={strings} />
@@ -60,18 +60,19 @@ export default async function ProfilePage() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HeroCard({ me }: { me: Me }) {
+function HeroCard({ me, strings }: { me: Me; strings: HomeStrings }) {
   const initials = me.full_name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase() ?? '')
     .join('');
-  const roleLabel = me.role === 'admin' ? 'Admin' : 'Sun-er';
+  const roleLabel =
+    me.role === 'admin' ? strings.profileRoleAdmin : strings.profileRoleUser;
 
   return (
     <section
-      aria-label="Tổng quan hồ sơ"
+      aria-label={strings.menuProfile}
       className="relative overflow-hidden rounded-[20px] border border-saa-border/40 bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent px-[32px] py-[40px] shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:px-[48px]"
     >
       <div
@@ -114,7 +115,7 @@ function HeroCard({ me }: { me: Me }) {
           <div className="flex flex-wrap items-center justify-center gap-[8px] md:justify-start">
             <RolePill role={me.role} label={roleLabel} />
             {me.department_name && <DepartmentPill name={me.department_name} />}
-            <StatusPill active={me.is_active} />
+            <StatusPill active={me.is_active} strings={strings} />
           </div>
         </div>
       </div>
@@ -164,7 +165,13 @@ function DepartmentPill({ name }: { name: string }) {
   );
 }
 
-function StatusPill({ active }: { active: boolean }) {
+function StatusPill({
+  active,
+  strings,
+}: {
+  active: boolean;
+  strings: HomeStrings;
+}) {
   return (
     <span
       className={[
@@ -181,33 +188,48 @@ function StatusPill({ active }: { active: boolean }) {
           active ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-saa-danger',
         ].join(' ')}
       />
-      {active ? 'Đang hoạt động' : 'Đã vô hiệu'}
+      {active ? strings.profileStatusActive : strings.profileStatusInactive}
     </span>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function DetailCard({ me }: { me: Me }) {
+function DetailCard({ me, strings }: { me: Me; strings: HomeStrings }) {
   return (
     <section
-      aria-label="Thông tin chi tiết"
+      aria-label={strings.profileSectionTitle}
       className="rounded-[20px] border border-saa-border/40 bg-saa-kudo-container/60 px-[24px] py-[32px] backdrop-blur-[6px] md:px-[40px]"
     >
       <h3 className="mb-[24px] font-montserrat text-[14px] font-bold uppercase tracking-[2px] text-saa-gold/80">
-        Thông tin tài khoản
+        {strings.profileSectionTitle}
       </h3>
       <dl className="grid grid-cols-1 gap-x-[40px] gap-y-[24px] sm:grid-cols-2">
-        <Field label="Họ và tên" value={me.full_name} />
-        <Field label="Email" value={me.email} mono />
-        <Field label="Phòng ban" value={me.department_name ?? 'Chưa gán'} />
-        <Field label="Vai trò" value={me.role === 'admin' ? 'Admin' : 'Sun-er'} />
-        <Field label="Ngôn ngữ" value={localeLabel(me.locale)} />
+        <Field label={strings.profileFieldFullName} value={me.full_name} />
+        <Field label={strings.profileFieldEmail} value={me.email} mono />
         <Field
-          label="Trạng thái"
-          value={me.is_active ? 'Đang hoạt động' : 'Đã vô hiệu'}
+          label={strings.profileFieldDepartment}
+          value={me.department_name ?? strings.profileDepartmentUnset}
         />
-        <Field label="ID nội bộ" value={me.id} mono />
+        <Field
+          label={strings.profileFieldRole}
+          value={
+            me.role === 'admin' ? strings.profileRoleAdmin : strings.profileRoleUser
+          }
+        />
+        <Field
+          label={strings.profileFieldLocale}
+          value={localeLabel(me.locale, strings)}
+        />
+        <Field
+          label={strings.profileFieldStatus}
+          value={
+            me.is_active
+              ? strings.profileStatusActive
+              : strings.profileStatusInactive
+          }
+        />
+        <Field label={strings.profileFieldUserId} value={me.id} mono />
       </dl>
     </section>
   );
@@ -247,14 +269,14 @@ function upscaleAvatar(url: string, size: number): string {
   return url.replace(/=s\d+-c$/, `=s${size}-c`);
 }
 
-function localeLabel(locale: string): string {
+function localeLabel(locale: string, strings: HomeStrings): string {
   switch (locale) {
     case 'vi':
-      return 'Tiếng Việt';
+      return strings.profileLocaleVi;
     case 'en':
-      return 'English';
+      return strings.profileLocaleEn;
     case 'ja':
-      return '日本語';
+      return strings.profileLocaleJa;
     default:
       return locale;
   }

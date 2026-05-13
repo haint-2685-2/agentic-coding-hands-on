@@ -8,12 +8,15 @@ export type KudoRow = {
   total_hearts?: number;
 };
 
+export type HeroTier = 'new' | 'rising' | 'super' | 'legend' | null;
+
 export type PartyInfo = {
   id: string;
   full_name: string;
   avatar_url: string | null;
   department_id: string | null;
   department_name: string | null;
+  hero_tier: HeroTier;
 };
 
 export type LikeInfo = { kudo_id: string; user_id: string; hearts: number };
@@ -39,6 +42,7 @@ const ANON_SENDER: PartyInfo = {
   avatar_url: null,
   department_id: null,
   department_name: null,
+  hero_tier: null,
 };
 
 export function toKudoJSON(

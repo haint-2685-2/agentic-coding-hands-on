@@ -35,6 +35,24 @@ export async function loadKudoBundle(
   for (const d of (deptRes.data ?? []) as { id: string; name: string }[]) {
     deptMap.set(d.id, d.name);
   }
+  // Hero tier per user — view `app_user_hero_v` rolls up distinct-sender
+  // counts (Figma `New/Rising/Super/Legend Hero`). Users with 0 received
+  // Kudos are absent from the view → tier stays null on the FE.
+  const heroRes = await service
+    .from('app_user_hero_v')
+    .select('user_id, tier')
+    .in('user_id', [...partyIds]);
+  const heroMap = new Map<string, 'new' | 'rising' | 'super' | 'legend'>();
+  for (const h of (heroRes.data ?? []) as { user_id: string; tier: string }[]) {
+    if (
+      h.tier === 'new' ||
+      h.tier === 'rising' ||
+      h.tier === 'super' ||
+      h.tier === 'legend'
+    ) {
+      heroMap.set(h.user_id, h.tier);
+    }
+  }
   const parties = new Map<string, PartyInfo>();
   for (const p of (partyRes.data ?? []) as { id: string; full_name: string; avatar_url: string | null; department_id: string | null }[]) {
     parties.set(p.id, {
@@ -43,6 +61,7 @@ export async function loadKudoBundle(
       avatar_url: p.avatar_url,
       department_id: p.department_id,
       department_name: p.department_id ? deptMap.get(p.department_id) ?? null : null,
+      hero_tier: heroMap.get(p.id) ?? null,
     });
   }
 

@@ -5,13 +5,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import type { Kudo } from '@/lib/api/kudos/types';
+import type { HeroTier, Kudo } from '@/lib/api/kudos/types';
 import type { Locale } from '@/lib/i18n/locale';
 import type { KudosStrings } from '@/lib/i18n/kudos';
 import { formatRelativeTime } from '@/lib/api/kudos/format';
 import { HashtagChip } from './HashtagChip';
 import { HeartButton } from './HeartButton';
 import { CopyLinkButton } from './CopyLinkButton';
+import { HeroBadge } from './HeroBadge';
 
 interface KudoCardProps {
   kudo: Kudo;
@@ -131,17 +132,19 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
 
       <div className="h-px w-full bg-saa-kudo-divider" />
 
-      {/* C.4 — Actions row */}
+      {/* C.4 — Actions row. "Chi tiết" + "Copy link" tạm disable, giữ visual
+          để layout không xô lệch. */}
       <div className="flex w-full flex-row items-center justify-between gap-[16px]">
         <HeartButton kudo={kudo} strings={strings} />
         <div className="flex flex-row items-center gap-[8px]">
-          <Link
-            href={`/kudos/${kudo.id}`}
-            className="hidden font-montserrat text-[14px] font-bold text-saa-kudo-text/80 hover:text-saa-kudo-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-kudo-text/30 md:inline-block"
+          <span
+            aria-disabled="true"
+            title="Tạm khoá"
+            className="hidden cursor-not-allowed font-montserrat text-[14px] font-bold text-saa-kudo-text/40 md:inline-block"
           >
             Chi tiết
-          </Link>
-          <CopyLinkButton kudoId={kudo.id} strings={strings} />
+          </span>
+          <CopyLinkButton kudoId={kudo.id} strings={strings} disabled />
         </div>
       </div>
     </article>
@@ -154,6 +157,7 @@ interface UserBlockProps {
     full_name: string;
     avatar_url: string | null;
     department_name: string | null;
+    hero_tier?: HeroTier;
   };
   clickable: boolean;
 }
@@ -175,8 +179,11 @@ function UserBlock({ user, clickable }: UserBlockProps) {
         <span className="line-clamp-2 text-center font-montserrat text-[14px] font-bold leading-[18px] text-saa-kudo-text md:text-[16px] md:leading-[22px]">
           {user.full_name}
         </span>
-        <span className="line-clamp-2 text-center font-montserrat text-[12px] font-medium leading-[16px] text-saa-kudo-muted md:text-[14px]">
-          {user.department_name ?? '—'}
+        <span className="flex items-center justify-center gap-[6px]">
+          <span className="font-montserrat text-[12px] font-medium leading-[16px] text-saa-kudo-muted md:text-[14px]">
+            {user.department_name ?? '—'}
+          </span>
+          {user.hero_tier ? <HeroBadge tier={user.hero_tier} height={22} /> : null}
         </span>
       </div>
     </>

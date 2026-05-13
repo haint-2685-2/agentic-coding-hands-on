@@ -5,18 +5,12 @@
 // decorative KV gradient bleeding in from the left edge.
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/browser';
 import { getSpotlight } from '@/lib/api/kudos/client';
 import type { SpotlightResponse } from '@/lib/api/kudos/types';
 import type { KudosStrings } from '@/lib/i18n/kudos';
 import { SpotlightSearch } from './SpotlightSearch';
-
-const SpotlightCloud = dynamic(() => import('./SpotlightCloud'), {
-  ssr: false,
-  loading: () => null,
-});
 
 interface SpotlightPaneProps {
   initial: SpotlightResponse;
@@ -124,20 +118,19 @@ export function SpotlightPane({ initial, strings }: SpotlightPaneProps) {
         )}
       </div>
 
-      {/* Word cloud — centered, takes the whole interior */}
-      <div
-        className="absolute inset-0 z-10 flex items-center justify-center px-[80px] pb-[140px] pt-[80px]"
-        aria-busy={loading || undefined}
-      >
-        {loading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-saa-bg/40 backdrop-blur-sm">
-            <span className="font-montserrat text-[14px] text-white/70">
-              {strings.feedLoading}
-            </span>
-          </div>
-        )}
-        <SpotlightCloud nodes={data.items} emptyLabel={strings.spotlightEmpty} />
-      </div>
+      {/* Center area is intentionally left blank — only the decorative KV
+          gradient + the ticker + chrome remain. Loading state still announces
+          for a11y. */}
+      {loading && (
+        <div
+          aria-busy="true"
+          className="absolute inset-0 z-20 flex items-center justify-center bg-saa-bg/40 backdrop-blur-sm"
+        >
+          <span className="font-montserrat text-[14px] text-white/70">
+            {strings.feedLoading}
+          </span>
+        </div>
+      )}
 
       {/* Live ticker — bottom-left, 5 lines */}
       {ticker.length > 0 && (

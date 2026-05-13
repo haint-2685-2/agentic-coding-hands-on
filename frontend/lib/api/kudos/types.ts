@@ -5,12 +5,15 @@
  *   backend/.momorph/specs/MaZUn5xHXZ-kudos-live-board/spec.md
  */
 
+export type HeroTier = 'new' | 'rising' | 'super' | 'legend' | null;
+
 export interface UserMini {
   id: string | null;
   full_name: string;
   avatar_url: string | null;
   department_id: string | null;
   department_name: string | null;
+  hero_tier: HeroTier;
 }
 
 export interface KudoImage {

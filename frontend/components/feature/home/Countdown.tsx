@@ -16,6 +16,7 @@ interface CountdownValues {
   days: string;
   hours: string;
   minutes: string;
+  seconds: string;
   isFrozen: boolean;
 }
 
@@ -25,27 +26,29 @@ function pad2(n: number): string {
 
 function compute(eventStartAt: string | null, isStarted: boolean): CountdownValues {
   if (isStarted) {
-    return { days: '00', hours: '00', minutes: '00', isFrozen: true };
+    return { days: '00', hours: '00', minutes: '00', seconds: '00', isFrozen: true };
   }
   if (!eventStartAt) {
-    return { days: '--', hours: '--', minutes: '--', isFrozen: true };
+    return { days: '--', hours: '--', minutes: '--', seconds: '--', isFrozen: true };
   }
   const target = Date.parse(eventStartAt);
   if (Number.isNaN(target)) {
-    return { days: '--', hours: '--', minutes: '--', isFrozen: true };
+    return { days: '--', hours: '--', minutes: '--', seconds: '--', isFrozen: true };
   }
   const delta = target - Date.now();
   if (delta <= 0) {
-    return { days: '00', hours: '00', minutes: '00', isFrozen: true };
+    return { days: '00', hours: '00', minutes: '00', seconds: '00', isFrozen: true };
   }
-  const totalMinutes = Math.floor(delta / 60_000);
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
+  const totalSeconds = Math.floor(delta / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
   return {
     days: pad2(days),
     hours: pad2(hours),
     minutes: pad2(minutes),
+    seconds: pad2(seconds),
     isFrozen: false,
   };
 }
@@ -69,6 +72,7 @@ export function Countdown({
           next.days === prev.days &&
           next.hours === prev.hours &&
           next.minutes === prev.minutes &&
+          next.seconds === prev.seconds &&
           next.isFrozen === prev.isFrozen
         ) {
           return prev;
@@ -110,6 +114,7 @@ export function Countdown({
         <Tile value={values.days} label={strings.days} />
         <Tile value={values.hours} label={strings.hours} />
         <Tile value={values.minutes} label={strings.minutes} />
+        <Tile value={values.seconds} label={strings.seconds} />
       </time>
     </div>
   );
