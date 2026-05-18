@@ -10,9 +10,14 @@ export function endpoint(path: string): string {
 }
 
 export function anonHeaders(extra?: HeadersInit): HeadersInit {
+  // Supabase Edge runtime rejects requests without a Bearer JWT even on
+  // functions that don't enforce user-level auth. Send the anon key as
+  // bearer so public endpoints (e.g. `/config-event`) pass the runtime
+  // gate and we don't fall back to a "null" event_start_at.
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
   return {
     apikey: anon,
+    authorization: `Bearer ${anon}`,
     'content-type': 'application/json',
     ...extra,
   };
