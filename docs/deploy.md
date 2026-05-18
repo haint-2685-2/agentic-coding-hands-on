@@ -195,8 +195,16 @@ Dashboard → **Settings** → **API**:
 | Key | Dùng cho |
 |---|---|
 | `Project URL` | `NEXT_PUBLIC_SUPABASE_URL` |
-| `anon public` key | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| `anon public` key (JWT format `eyJ...`) | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
 | `service_role` key | **KHÔNG** dùng ở frontend — chỉ dùng cho admin script |
+
+> ⚠️ **Pitfall publishable key vs anon JWT**: Dashboard 2026+ hiện cả 2 hệ key —
+> `sb_publishable_xxx` (mới, format ngắn, không phải JWT) và `eyJhbGc...` (legacy
+> anon JWT). Edge Functions runtime hiện tại vẫn bắt buộc Bearer là **JWT**, nên
+> dùng publishable key sẽ trả `UNAUTHORIZED_INVALID_JWT_FORMAT` cho mọi request
+> public (vd `/config-event`). FE sẽ rơi vào fallback và countdown/hero render
+> rỗng. Luôn copy key `eyJ...` (cuộn xuống mục "Legacy API Keys" hoặc dùng
+> `supabase projects api-keys --project-ref <ref>` để lấy đúng).
 
 ---
 
@@ -320,6 +328,10 @@ Cold-start sau deploy ~1–2s. Function log live tại Dashboard → Edge Functi
 |---|---|---|
 | `supabase db push` báo "permission denied" | Sai DB password khi link | `supabase link --project-ref <ref>` lại |
 | Function 401 "Invalid JWT" | Frontend gọi với anon key sai env | Check `NEXT_PUBLIC_SUPABASE_ANON_KEY` trên Vercel |
+| Function 401 `UNAUTHORIZED_INVALID_JWT_FORMAT` | Dùng publishable key (`sb_publishable_...`) thay vì anon JWT (`eyJ...`) | Lấy đúng key qua `supabase projects api-keys --project-ref <ref>`, replace value trên Vercel, redeploy |
+| Vercel deploy "Ready" nhưng mọi URL 404 + `Builds: . [0ms]` | Framework Preset = `null` ⇒ Vercel build nhưng không wire serverless functions | Tạo `frontend/vercel.json` với `{ "framework": "nextjs" }` hoặc set Framework Preset trong Settings → Build và Deployment |
+| Vercel URL chấp nhận login nhưng OAuth redirect về `localhost:3000` | Site URL ở Supabase Auth chưa update | URL Configuration → Site URL = `https://<your-domain>` + add Redirect URL `https://<your-domain>/**` |
+| FE bundle bake key cũ sau khi đổi env | Vercel cache build trước | Push commit rỗng `git commit --allow-empty -m "..."` để force rebuild |
 | Login OK nhưng API trả 401 | `Site URL` chưa khớp domain Vercel | Cập nhật URL Configuration mục 2.5 |
 | `Failed to fetch` ở browser | Function chưa deploy, hoặc CORS chặn | Check Network tab + `supabase functions list` |
 | Image upload 403 | RLS storage policy fail | Verify migration `20260513090003` đã chạy |

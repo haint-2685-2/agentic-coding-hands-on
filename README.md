@@ -18,7 +18,7 @@ saa-2025/
 
 | Layer | Tech | Highlights |
 |---|---|---|
-| [backend/](./backend) | Supabase CLI · Postgres · Deno Edge Functions | 18 migrations · 19 Edge Functions · 129 tests xanh |
+| [backend/](./backend) | Supabase CLI · Postgres · Deno Edge Functions | 28 migrations · 21 Edge Functions · 129 tests (counts at 2026-05-12 baseline; new title / sanitize / bucket / lightbox code paths chưa được unit-test thêm) |
 | [frontend/](./frontend) | Next.js 14 · TypeScript · Tailwind · supabase-js | ~9.5K LOC · 57 asset từ Figma · Playwright scaffold |
 
 Spec per màn cho cả 2 layer ở `<layer>/.momorph/specs/`. API catalog tổng:

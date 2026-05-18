@@ -69,8 +69,8 @@ flowchart TD
 | `/functions/v1/me/notifications` | GET | Homepage SAA | Notification panel list | New |
 | `/functions/v1/me/notifications/{id}` | PATCH | Homepage SAA | Mark one read | New |
 | `/functions/v1/me/notifications/mark-all-read` | POST | Homepage SAA | Mark all read | New |
-| `/functions/v1/kudos` | GET | Live board | Paginated kudos feed with filters | New |
-| `/functions/v1/kudos/highlights` | GET | Live board | Top 5 carousel (MV-backed) | New |
+| `/functions/v1/kudos` | GET | Live board | Paginated kudos feed with filters. Each kudo includes `title` (string, ≤80 chars; empty for pre-2026-05-18 rows) since the column landed in migration `20260518100000`. | New |
+| `/functions/v1/kudos/highlights` | GET | Live board | Top 5 carousel (MV-backed). `kudo_highlights_v` view recreated with `title` column in migration `20260518100001`. | New |
 | `/functions/v1/kudos/spotlight` | GET | Live board | Recipient aggregation + search | New |
 | `/functions/v1/kudos/stats` | GET | Live board | Totals + top senders/receivers | New |
 | `/functions/v1/kudos/{id}/like` | POST | Live board | Like (idempotent, sender forbidden) | New |
@@ -79,7 +79,7 @@ flowchart TD
 | `/functions/v1/departments` | GET | Live board | Filter dropdown source | New |
 | `/functions/v1/users/{id}` | GET | Live board, Profile | Minimal user lookup | New |
 | `/functions/v1/users?q=` | GET | Viết Kudo | Typeahead for receiver + @mention | New |
-| `/functions/v1/kudos` | POST | Viết Kudo | Create kudo (transactional RPC) | New |
+| `/functions/v1/kudos` | POST | Viết Kudo | Create kudo (transactional RPC). Body: `receiver_id` (uuid), **`title` (string, 1–80 chars, required)**, `message` (sanitized HTML, 1–1000 plain-text chars), `hashtags` (1–5 slugs), `image_paths` (0–5), `is_anonymous` (bool), `anonymous_display_name?`. Errors: `validation/title_required`, `validation/title_max` added 2026-05-18. | New |
 | `/functions/v1/kudos/upload-url` | POST | Viết Kudo | Presigned image upload URL | New |
 | `/functions/v1/awards/{slug}` | GET | Hệ thống giải | Award detail (auth-only — includes prize money) | New |
 | `/functions/v1/awards?detail=true` | GET | Hệ thống giải | Batch detail variant | New (overload) |

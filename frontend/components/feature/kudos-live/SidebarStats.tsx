@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import type { KudosStats, LeaderboardEntry } from '@/lib/api/kudos/types';
 import type { KudosStrings } from '@/lib/i18n/kudos';
 import { SecretBoxCTA } from './SecretBoxCTA';
@@ -80,10 +79,9 @@ function Leaderboard({ title, entries, emptyLabel }: LeaderboardProps) {
         <ol className="flex flex-col items-stretch gap-[12px]">
           {entries.slice(0, 10).map((entry, idx) => (
             <li key={entry.id}>
-              <Link
-                href={`/users/${entry.id}`}
-                className="flex w-full items-center gap-[12px] rounded-[8px] px-[8px] py-[8px] transition-colors hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-gold"
-              >
+              {/* /users/[id] page hasn't shipped — render as static row so
+                  the leaderboard doesn't dead-link. */}
+              <div className="flex w-full items-center gap-[12px] rounded-[8px] px-[8px] py-[8px]">
                 <span className="w-[24px] text-right font-montserrat text-[14px] font-bold text-saa-gold">
                   {idx + 1}
                 </span>
@@ -111,7 +109,7 @@ function Leaderboard({ title, entries, emptyLabel }: LeaderboardProps) {
                 <span className="font-montserrat text-[16px] font-bold text-saa-gold">
                   {entry.count}
                 </span>
-              </Link>
+              </div>
             </li>
           ))}
         </ol>

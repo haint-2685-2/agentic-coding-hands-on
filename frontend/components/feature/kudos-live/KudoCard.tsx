@@ -3,12 +3,12 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { HeroTier, Kudo } from '@/lib/api/kudos/types';
 import type { Locale } from '@/lib/i18n/locale';
 import type { KudosStrings } from '@/lib/i18n/kudos';
 import { formatRelativeTime, kudoImageUrl } from '@/lib/api/kudos/format';
+import { sanitizeKudoHtml } from '@/lib/kudos/sanitize-html';
 import { HashtagChip } from './HashtagChip';
 import { HeartButton } from './HeartButton';
 import { CopyLinkButton } from './CopyLinkButton';
@@ -56,7 +56,7 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
     >
       {/* C.3.1 / C.3.3 — Info user row */}
       <div className="flex w-full flex-row items-start justify-between gap-[16px]">
-        <UserBlock user={sender} clickable={!kudo.is_anonymous} />
+        <UserBlock user={sender} />
         <div className="flex h-[123px] items-center px-[0px] py-[16px]">
           <Image
             src="/assets/kudos-live-board/icon-send.svg"
@@ -67,7 +67,7 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
             className="h-[32px] w-[32px]"
           />
         </div>
-        <UserBlock user={kudo.receiver} clickable />
+        <UserBlock user={kudo.receiver} />
       </div>
 
       <div className="h-px w-full bg-saa-kudo-divider" />
@@ -94,9 +94,11 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
             className={`kudo-message-body whitespace-pre-line font-montserrat text-[14px] font-medium leading-[22px] text-saa-kudo-text md:text-[16px] md:leading-[24px] ${
               expanded ? '' : 'line-clamp-6'
             }`}
-            // The body is sanitized via `sanitizeKudoHtml` on submit. We
-            // re-sanitize here in case legacy plain-text rows are present.
-            dangerouslySetInnerHTML={{ __html: kudo.message }}
+            // Defense in depth: sanitize on read even though we also sanitize
+            // on submit. Rows can land in the DB via seeds, admin tools, or
+            // future non-FE clients that bypass `sanitizeKudoHtml`, so the
+            // viewer's render path is the only choke point we control.
+            dangerouslySetInnerHTML={{ __html: sanitizeKudoHtml(kudo.message) }}
           />
           {isLongMessage && (
             <button
@@ -286,10 +288,9 @@ interface UserBlockProps {
     department_name: string | null;
     hero_tier?: HeroTier;
   };
-  clickable: boolean;
 }
 
-function UserBlock({ user, clickable }: UserBlockProps) {
+function UserBlock({ user }: UserBlockProps) {
   const inner = (
     <>
       <div className="relative h-[64px] w-[64px] overflow-hidden rounded-full border-[1.869px] border-white bg-[#EEE]">
@@ -316,18 +317,10 @@ function UserBlock({ user, clickable }: UserBlockProps) {
     </>
   );
 
+  // The /users/[id] page hasn't shipped yet — render as a static block so
+  // we don't dead-link from the public board. Re-introduce the <Link> wrap
+  // once `app/users/[id]/page.tsx` exists.
   const cls =
     'flex h-[123px] w-full max-w-[235px] flex-col items-center justify-center gap-[13px]';
-
-  if (clickable && user.id) {
-    return (
-      <Link
-        href={`/users/${user.id}`}
-        className={`${cls} rounded-[8px] transition-colors hover:bg-[rgba(0,16,26,0.04)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-kudo-text/30`}
-      >
-        {inner}
-      </Link>
-    );
-  }
   return <div className={cls}>{inner}</div>;
 }

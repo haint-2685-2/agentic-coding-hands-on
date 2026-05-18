@@ -1,3 +1,13 @@
 # Runtime state from scripts/docker.sh
 .fe-dev.pid
 .fe-dev.log
+
+# Vercel CLI link + env pull
+.vercel
+.env*.local
+
+# Claude Code local state
+.claude/
+
+# Supabase CLI temp (auto-created on `supabase link` at repo root)
+/supabase/

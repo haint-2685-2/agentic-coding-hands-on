@@ -79,8 +79,9 @@ app/
 |---|---|---|---|
 | `components/feature/kudo/KudoComposeDialog.tsx` | Top-level modal: composes RHF form + footer + close handlers; owns abort controller | Client (state + events) | `triggerRef?: RefObject<HTMLElement>`, `mode: 'modal' \| 'page'` |
 | `components/feature/kudo/ReceiverField.tsx` | Receiver Combobox; calls `lib/api/users.search` debounced | Client | RHF `control`, `name='receiver'`, `error?` |
-| `components/feature/kudo/MessageEditor.tsx` | Textarea + toolbar + `@mention` popover + counter + live region | Client | RHF `control`, `name='message'`, `maxLength=1000` |
-| `components/feature/kudo/RichTextToolbar.tsx` | B/I/S/list/link/quote toggles operating on the textarea selection | Client | `editorRef` |
+| `components/feature/kudo-compose/TitleInput.tsx` | "Danh hiệu" required text field (1–80 chars, hint copy). Added 2026-05-18 after Figma re-audit. | Client | `value`, `onChange`, `errorMessage?` |
+| `components/feature/kudo-compose/MessageEditor.tsx` | ⚠️ Replaces original plan: contentEditable WYSIWYG (not textarea + toolbar). Toolbar + editor + `@mention` popover + char counter live in this one file; produces sanitized HTML via `lib/kudos/sanitize-html.ts`. | Client | `value: string` (HTML), `onChange(html)`, `errorMessage?` |
+| ~~`components/feature/kudo/RichTextToolbar.tsx`~~ | **Superseded** by `MessageEditor` (which absorbs the toolbar). Removed in commit `feat: kudo title field, rich-text editor, ...` | — | — |
 | `components/feature/kudo/MentionPopover.tsx` | `@<prefix>` listbox anchored to the caret | Client | `editorRef`, `onPick` |
 | `components/feature/kudo/HashtagField.tsx` | Chip row + `+ Hashtag` popover; enforces 1..5 cap | Client | RHF `control`, `name='hashtags'`, `error?` |
 | `components/feature/kudo/HashtagPicker.tsx` | Popover Combobox sourced by `lib/api/hashtags.search` | Client | `existing`, `onAdd` |
@@ -168,18 +169,17 @@ frontend/
 │   │   ├── Toast.tsx
 │   │   ├── FieldError.tsx
 │   │   └── Spinner.tsx
-│   └── feature/kudo/
+│   └── feature/kudo-compose/         # actual dir name (renamed from kudo/)
 │       ├── KudoComposeDialog.tsx
-│       ├── ReceiverField.tsx
-│       ├── MessageEditor.tsx
-│       ├── RichTextToolbar.tsx
-│       ├── MentionPopover.tsx
-│       ├── HashtagField.tsx
+│       ├── ReceiverPicker.tsx        # named *Picker not *Field
+│       ├── TitleInput.tsx            # NEW 2026-05-18 (Danh hiệu)
+│       ├── MessageEditor.tsx         # WYSIWYG contentEditable, absorbs toolbar
 │       ├── HashtagPicker.tsx
-│       ├── ImageField.tsx
-│       ├── ImageThumbnail.tsx
-│       ├── AnonymousField.tsx
-│       └── ComposerFooter.tsx
+│       ├── ImageUploader.tsx
+│       ├── AnonymousToggle.tsx
+│       ├── SubmitBar.tsx
+│       ├── ErrorBanner.tsx
+│       └── use-upload-pool.ts
 ├── lib/
 │   ├── api/
 │   │   ├── _client.ts

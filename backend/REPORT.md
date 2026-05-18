@@ -11,8 +11,9 @@
 ## Executive summary
 
 - 6/6 server-side screens implemented end-to-end.
-- 113 Deno tests + 16 pgTAP tests (129 total) all green.
-- 18 SQL migrations, 19 Edge Functions, 22 commits (8 feature/docs commits).
+- 113 Deno tests + 16 pgTAP tests (129 total) all green at the 2026-05-12 baseline.
+- 28 SQL migrations · 21 Edge Functions at 2026-05-18 (baseline 18/19 + later additions for demo seed, hero view, badge / secret-box, CEVC departments, kudo title, kudo bucket public-read, dropped read policy).
+- **Test suite not re-run** after the 2026-05-18 additions (title column, sanitize-html, image lightbox, KudoCreatedToast, bucket policy change). Re-run with `deno test --allow-net --allow-env --allow-read supabase/tests/` + `supabase test db` before pinning a new total.
 - Zero unresolved spec gaps; all decisions recorded in commit messages and
   in [.momorph/specs/<screen>/plan.md](.momorph/specs/) Notes sections.
 
@@ -174,7 +175,7 @@ integration tests cover Edge Functions end-to-end.
 
 supabase/
 ├── config.toml                      # Google OAuth + before_user_created hook
-├── migrations/                      # 18 .sql files, append-only
+├── migrations/                      # 28 .sql files, append-only
 ├── functions/
 │   ├── _shared/                     # 13 utility modules (auth, http, log,
 │   │                                #   pagination, cache, rate-limit,

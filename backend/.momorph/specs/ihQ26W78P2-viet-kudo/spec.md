@@ -15,7 +15,8 @@
 The Viết Kudo modal lets a signed-in Sun-er compose a kudos with the following payload:
 
 - **Receiver** — picked from a typeahead of all active `app_user`s. Required.
-- **Message** — free-form text body. Required. May contain `@<username>` mentions which we parse server-side to produce notifications.
+- **Title** ("Danh hiệu") — short headline the sender awards the recipient, shown as the card title on the Live board. Required, 1–80 chars. Added 2026-05-18 per migration `20260518100000_add_kudo_title.sql`.
+- **Message** — sanitized rich-text HTML body produced by the FE `MessageEditor` (B/I/S/list/quote/link). Required. May contain `@<username>` mentions which we parse server-side to produce notifications. BE stores HTML verbatim (FE allowlists tags via `lib/kudos/sanitize-html.ts` before submit *and* re-sanitizes on render).
 - **Hashtags** — 1..5 tags. Required at least one. Existing hashtags are reused; new ones are created on the fly.
 - **Images** — 0..5 attachments (jpg/png). Uploaded to Supabase Storage in a separate step *before* the POST; the POST references storage paths.
 - **Anonymous flag** — boolean. When true the FE shows an additional "anonymous display name" field; when sent, the kudo is stored with `is_anonymous=true` and an optional `anonymous_display_name` snapshot.
@@ -74,7 +75,9 @@ Submitting with any required field empty must fail at the server with a clear er
 **Acceptance Scenarios**:
 
 1. **Given** an empty `receiver_id`, **When** posted, **Then** `422 { error: { code: "validation/required", fields: ["receiver_id"], message } }`.
-2. **Given** an empty `message`, **When** posted, **Then** `422 { error: { code: "validation/required", fields: ["message"] } }`.
+2. **Given** an empty `title` (whitespace-only after trim), **When** posted, **Then** `422 { error: { code: "validation/title_required", fields: ["title"], message: "Title is required." } }`. (Added 2026-05-18.)
+3. **Given** `title.length > 80`, **When** posted, **Then** `422 { code: "validation/title_max", fields: ["title"], message: "Title exceeds 80 chars." }`. (Added 2026-05-18.)
+4. **Given** an empty `message`, **When** posted, **Then** `422 { error: { code: "validation/required", fields: ["message"] } }`.
 3. **Given** `hashtags: []`, **When** posted, **Then** `422 { error: { code: "validation/required", fields: ["hashtags"], message: "At least 1 hashtag is required." } }`.
 4. **Given** `hashtags.length > 5`, **When** posted, **Then** `422 { error: { code: "validation/hashtags_max", message: "At most 5 hashtags allowed." } }`.
 5. **Given** `message.length > 1000`, **When** posted, **Then** `422 { code: "validation/message_max" }`.

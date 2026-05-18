@@ -70,11 +70,13 @@ export default function SpotlightCloud({ nodes, emptyLabel }: SpotlightCloudProp
           </Link>
         ))}
       </div>
-      {/* SR-only parallel list. */}
+      {/* SR-only parallel list. Mirrors the visual cloud target so screen
+          readers route to the same filtered feed instead of the
+          not-yet-shipped /users/[id] page. */}
       <ul className="sr-only">
         {nodes.map((n) => (
           <li key={`${n.user_id}-sr`}>
-            <Link href={`/users/${n.user_id}`}>
+            <Link href={`/kudos?receiver=${n.user_id}`}>
               {n.full_name} — {n.count}
             </Link>
           </li>

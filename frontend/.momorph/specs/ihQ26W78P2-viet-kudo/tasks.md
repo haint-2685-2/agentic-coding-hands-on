@@ -154,12 +154,28 @@
 
 ---
 
-## Phase 11: User Story 8 — Rich-text toolbar (P3)
+## Phase 11: User Story 8 — Rich-text editor (P3)
 
-- [ ] T110 [US8] Implement `RichTextToolbar` (B/I/S/list/link/quote) using `applyInlineMark` | frontend/components/feature/kudo/RichTextToolbar.tsx
-- [ ] T111 [US8] Inline link prompt (small popover) → `[selection](url)` insert | frontend/components/feature/kudo/RichTextToolbar.tsx
-- [ ] T112 [P] [US8] Vitest — `applyInlineMark` for each operator (AC1–AC4) | frontend/tests/unit/applyInlineMark.test.ts
-- [ ] T113 [P] [US8] Playwright — toolbar buttons mutate textarea selection as Markdown markers | frontend/tests/e2e/kudo-compose.spec.ts
+> **Superseded 2026-05-18** — original textarea-based markdown approach was
+> dropped in favour of a contentEditable WYSIWYG that produces sanitized HTML.
+> Toolbar and editor merged into `MessageEditor.tsx`; `RichTextToolbar.tsx`
+> and `MessageTextarea.tsx` were deleted in the same commit. Tests below are
+> obsolete; see notes inline.
+
+- [x] T110 [US8] ~~`RichTextToolbar` (B/I/S/list/link/quote)~~ — replaced by toolbar inlined in `MessageEditor.tsx` (commands use `document.execCommand` against contentEditable instead of Markdown markers on a textarea).
+- [x] T111 [US8] ~~Inline link prompt → `[selection](url)`~~ — replaced by `window.prompt` for URL → `document.execCommand('createLink', false, url)`.
+- [ ] T112 [P] [US8] ~~Vitest `applyInlineMark`~~ — obsolete (no `applyInlineMark` helper exists). Replace with sanitizer round-trip test for `lib/kudos/sanitize-html.ts`.
+- [ ] T113 [P] [US8] ~~Playwright toolbar mutates textarea~~ — obsolete. Replace with Playwright check that B button on selection yields a `<strong>` in `innerHTML` and round-trips through the sanitizer.
+
+### Added 2026-05-18 (was missing from original plan)
+
+- [x] T114 [US9] **Danh hiệu** required field `TitleInput.tsx` (1–80 chars, hint copy from Figma) | frontend/components/feature/kudo-compose/TitleInput.tsx
+- [x] T115 [US9] BE migration `20260518100000_add_kudo_title.sql` + recreate `kudo_highlights_v` to expose `title` | backend/supabase/migrations/
+- [x] T116 [US9] Wire `title` through validator → `createKudo` payload → BE Zod schema | frontend/lib/validation/kudo.ts
+- [x] T117 [US9] Render `title` as `<h3>` centered above message in `KudoCard` | frontend/components/feature/kudos-live/KudoCard.tsx
+- [x] T118 [US10] Sanitize-on-read in `KudoCard` (defense in depth vs admin/seed inserts) | frontend/components/feature/kudos-live/KudoCard.tsx
+- [x] T119 [US10] Image lightbox modal (Esc / arrows / backdrop close) | frontend/components/feature/kudos-live/KudoCard.tsx
+- [x] T11A [US11] Success toast `KudoCreatedToast` via CustomEvent (top-right, 5s, manual close) | frontend/components/feature/kudos-live/KudoCreatedToast.tsx
 
 ---
 
