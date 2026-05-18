@@ -2,6 +2,7 @@ export type KudoRow = {
   id: string;
   sender_id: string;
   receiver_id: string;
+  title: string;
   message: string;
   is_anonymous: boolean;
   created_at: string;
@@ -24,6 +25,7 @@ export type LikeInfo = { kudo_id: string; user_id: string; hearts: number };
 export type KudoJSON = {
   id: string;
   created_at: string;
+  title: string;
   message: string;
   hashtags: string[];
   images: { id: string; path: string; position: number }[];
@@ -62,6 +64,7 @@ export function toKudoJSON(
   return {
     id: row.id,
     created_at: row.created_at,
+    title: row.title ?? '',
     message: row.message,
     hashtags: hashtags.get(row.id) ?? [],
     images: images.get(row.id) ?? [],

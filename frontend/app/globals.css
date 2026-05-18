@@ -53,6 +53,41 @@ body {
     background: rgba(255, 234, 158, 0.3);
     border-radius: 4px;
   }
+  /* Kudo rich editor (contentEditable) — placeholder + inline mark styling. */
+  .kudo-rich-editor:empty::before {
+    content: attr(data-placeholder);
+    color: rgba(31, 31, 31, 0.4);
+    pointer-events: none;
+  }
+  .kudo-rich-editor blockquote {
+    border-left: 3px solid rgba(255, 234, 158, 0.8);
+    padding-left: 12px;
+    color: rgba(31, 31, 31, 0.8);
+    margin: 4px 0;
+  }
+  .kudo-rich-editor ol {
+    list-style: decimal;
+    padding-left: 24px;
+  }
+  .kudo-rich-editor a {
+    color: #B45309;
+    text-decoration: underline;
+  }
+  /* Render side for KudoCard messages. */
+  .kudo-message-body blockquote {
+    border-left: 3px solid rgba(255, 234, 158, 0.8);
+    padding-left: 12px;
+    color: rgba(31, 31, 31, 0.8);
+    margin: 4px 0;
+  }
+  .kudo-message-body ol {
+    list-style: decimal;
+    padding-left: 24px;
+  }
+  .kudo-message-body a {
+    color: #B45309;
+    text-decoration: underline;
+  }
 }
 
 @keyframes heartPop {

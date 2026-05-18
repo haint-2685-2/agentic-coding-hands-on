@@ -1,5 +1,14 @@
 import type { Locale } from '@/lib/i18n/locale';
 
+// Backend stores `kudos/<userId>/<uuid>.<ext>` (path already includes the
+// bucket prefix). Bucket is public, so resolve to the storage public URL.
+export function kudoImageUrl(path: string): string {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+  return `${base}/storage/v1/object/public/${path}`;
+}
+
 const VI: Record<string, (n: number) => string> = {
   s: (n) => (n <= 5 ? 'Vừa xong' : `${n} giây trước`),
   m: (n) => `${n} phút trước`,

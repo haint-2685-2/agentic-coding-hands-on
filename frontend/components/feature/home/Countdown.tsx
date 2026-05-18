@@ -53,14 +53,22 @@ function compute(eventStartAt: string | null, isStarted: boolean): CountdownValu
   };
 }
 
+const PLACEHOLDER: CountdownValues = {
+  days: '--',
+  hours: '--',
+  minutes: '--',
+  seconds: '--',
+  isFrozen: true,
+};
+
 export function Countdown({
   eventStartAt,
   isStarted,
   strings,
 }: CountdownProps) {
-  const [values, setValues] = useState<CountdownValues>(() =>
-    compute(eventStartAt, isStarted),
-  );
+  // Render a placeholder on the server / first client render so SSR markup
+  // matches hydration; replace with live values inside useEffect.
+  const [values, setValues] = useState<CountdownValues>(PLACEHOLDER);
 
   useEffect(() => {
     setValues(compute(eventStartAt, isStarted));

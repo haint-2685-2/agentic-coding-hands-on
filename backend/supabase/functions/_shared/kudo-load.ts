@@ -17,7 +17,7 @@ export async function loadKudoBundle(
 ): Promise<KudoBundle> {
   const rowsRes = await service
     .from('kudo')
-    .select('id, sender_id, receiver_id, message, is_anonymous, created_at')
+    .select('id, sender_id, receiver_id, title, message, is_anonymous, created_at')
     .in('id', kudoIds);
   const rows = (rowsRes.data ?? []) as KudoRow[];
 

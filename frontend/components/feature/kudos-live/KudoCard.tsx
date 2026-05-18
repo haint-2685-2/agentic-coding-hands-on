@@ -4,11 +4,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { HeroTier, Kudo } from '@/lib/api/kudos/types';
 import type { Locale } from '@/lib/i18n/locale';
 import type { KudosStrings } from '@/lib/i18n/kudos';
-import { formatRelativeTime } from '@/lib/api/kudos/format';
+import { formatRelativeTime, kudoImageUrl } from '@/lib/api/kudos/format';
 import { HashtagChip } from './HashtagChip';
 import { HeartButton } from './HeartButton';
 import { CopyLinkButton } from './CopyLinkButton';
@@ -25,10 +25,16 @@ const MESSAGE_CLAMP = 6;
 
 export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const time = useMemo(() => formatRelativeTime(kudo.created_at, locale), [
     kudo.created_at,
     locale,
   ]);
+
+  const images = kudo.images.slice(0, 5).map((img) => ({
+    id: img.id,
+    url: kudoImageUrl(img.path),
+  }));
 
   const isLongMessage = kudo.message.split('\n').length > MESSAGE_CLAMP || kudo.message.length > 280;
 
@@ -75,16 +81,23 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
           {time}
         </time>
 
+        {kudo.title && (
+          <h3 className="w-full text-center font-montserrat text-[18px] font-bold leading-[26px] text-saa-kudo-text md:text-[22px] md:leading-[30px]">
+            {kudo.title}
+          </h3>
+        )}
+
         <div
           className={`w-full self-stretch rounded-[12px] border border-saa-gold bg-saa-kudo-msg-bg px-[16px] py-[16px] md:px-[24px]`}
         >
-          <p
-            className={`whitespace-pre-line font-montserrat text-[14px] font-medium leading-[22px] text-saa-kudo-text md:text-[16px] md:leading-[24px] ${
+          <div
+            className={`kudo-message-body whitespace-pre-line font-montserrat text-[14px] font-medium leading-[22px] text-saa-kudo-text md:text-[16px] md:leading-[24px] ${
               expanded ? '' : 'line-clamp-6'
             }`}
-          >
-            {kudo.message}
-          </p>
+            // The body is sanitized via `sanitizeKudoHtml` on submit. We
+            // re-sanitize here in case legacy plain-text rows are present.
+            dangerouslySetInnerHTML={{ __html: kudo.message }}
+          />
           {isLongMessage && (
             <button
               type="button"
@@ -97,14 +110,13 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
         </div>
 
         {/* C.3.6 — Image gallery (≤ 5 tiles) */}
-        {kudo.images.length > 0 && (
+        {images.length > 0 && (
           <div className="flex w-full flex-row items-center gap-[16px] overflow-x-auto kudos-scroll-x">
-            {kudo.images.slice(0, 5).map((img) => (
-              <a
+            {images.map((img, i) => (
+              <button
                 key={img.id}
-                href={img.url}
-                target="_blank"
-                rel="noreferrer"
+                type="button"
+                onClick={() => setLightboxIndex(i)}
                 className="relative h-[88px] w-[88px] flex-shrink-0 overflow-hidden rounded-[18px] border border-saa-border bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-saa-gold"
                 aria-label="Xem ảnh"
               >
@@ -115,7 +127,7 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
                   sizes="88px"
                   className="object-cover"
                 />
-              </a>
+              </button>
             ))}
           </div>
         )}
@@ -147,7 +159,122 @@ export function KudoCard({ kudo, locale, strings, variant = 'feed' }: KudoCardPr
           <CopyLinkButton kudoId={kudo.id} strings={strings} disabled />
         </div>
       </div>
+
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={images}
+          index={lightboxIndex}
+          onChange={setLightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </article>
+  );
+}
+
+interface ImageLightboxProps {
+  images: { id: string; url: string }[];
+  index: number;
+  onChange: (i: number) => void;
+  onClose: () => void;
+}
+
+function ImageLightbox({ images, index, onChange, onClose }: ImageLightboxProps) {
+  const total = images.length;
+  const current = images[index];
+
+  const prev = useCallback(() => {
+    if (total <= 1) return;
+    onChange((index - 1 + total) % total);
+  }, [index, total, onChange]);
+  const next = useCallback(() => {
+    if (total <= 1) return;
+    onChange((index + 1) % total);
+  }, [index, total, onChange]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        next();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose, prev, next]);
+
+  if (!current) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ảnh đính kèm"
+      onClick={onClose}
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-[24px]"
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Đóng"
+        className="absolute right-[16px] top-[16px] flex h-[44px] w-[44px] items-center justify-center rounded-full bg-white/10 text-white text-[24px] leading-none hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      >
+        ×
+      </button>
+      {total > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              prev();
+            }}
+            aria-label="Ảnh trước"
+            className="absolute left-[16px] top-1/2 flex h-[48px] w-[48px] -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white text-[28px] leading-none hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              next();
+            }}
+            aria-label="Ảnh sau"
+            className="absolute right-[16px] top-1/2 flex h-[48px] w-[48px] -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white text-[28px] leading-none hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            ›
+          </button>
+        </>
+      )}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-full max-w-full items-center justify-center"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={current.url}
+          alt=""
+          className="max-h-[90vh] max-w-[90vw] rounded-[8px] object-contain"
+        />
+      </div>
+      {total > 1 && (
+        <span className="absolute bottom-[24px] left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-[12px] py-[4px] font-montserrat text-[14px] text-white">
+          {index + 1} / {total}
+        </span>
+      )}
+    </div>
   );
 }
 

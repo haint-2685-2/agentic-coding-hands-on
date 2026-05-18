@@ -13,6 +13,8 @@ import {
 } from 'react';
 import { createClient } from '@/lib/supabase/browser';
 import { createKudo } from '@/lib/api/kudos-compose/client';
+import { sanitizeKudoHtml } from '@/lib/kudos/sanitize-html';
+import { KUDO_CREATED_EVENT } from '@/components/feature/kudos-live/KudoCreatedToast';
 import type { Hashtag } from '@/lib/api/kudos/types';
 import {
   emptyKudoForm,
@@ -23,7 +25,8 @@ import {
   type KudoFormValues,
 } from '@/lib/validation/kudo';
 import { ReceiverPicker } from './ReceiverPicker';
-import { MessageTextarea } from './MessageTextarea';
+import { TitleInput } from './TitleInput';
+import { MessageEditor } from './MessageEditor';
 import { HashtagPicker } from './HashtagPicker';
 import { ImageUploader } from './ImageUploader';
 import { AnonymousToggle } from './AnonymousToggle';
@@ -86,6 +89,7 @@ export function KudoComposeDialog({
   // Track dirty state for confirm-on-close.
   const isDirty =
     values.receiver_id !== null ||
+    values.title.length > 0 ||
     values.message.length > 0 ||
     values.hashtags.length > 0 ||
     values.image_paths.length > 0 ||
@@ -179,6 +183,8 @@ export function KudoComposeDialog({
         let target: HTMLElement | null = null;
         if (f === 'receiver_id') {
           target = root.querySelector<HTMLElement>('input[role="combobox"]');
+        } else if (f === 'title') {
+          target = root.querySelector<HTMLElement>('input[aria-required="true"]:not([role])');
         } else if (f === 'message') {
           target = root.querySelector<HTMLElement>('#kudo-message');
         } else if (f === 'hashtags') {
@@ -209,13 +215,28 @@ export function KudoComposeDialog({
     submitCtrlRef.current = ctrl;
     try {
       const supabase = createClient();
-      const res = await createKudo(supabase, result.payload!, {
+      // Sanitize the rich-text HTML on submit so the saved blob is bounded
+      // to the editor's allowlist regardless of what execCommand produced.
+      const cleanedPayload = {
+        ...result.payload!,
+        message: sanitizeKudoHtml(result.payload!.message),
+      };
+      const res = await createKudo(supabase, cleanedPayload, {
         signal: ctrl.signal,
       });
       if (res.ok) {
-        // No optimistic feed prepend per plan.
+        // No optimistic feed prepend per plan. Fire the toast event first
+        // (the listener lives on /kudos which is still mounted under the
+        // intercepted modal route), then navigate back, then refresh so
+        // the new kudo lands in the feed without an F5.
+        try {
+          window.dispatchEvent(new CustomEvent(KUDO_CREATED_EVENT));
+        } catch {
+          /* event dispatch unavailable — toast just won't show */
+        }
         dispatch({ type: 'reset' });
         close();
+        router.refresh();
         return;
       }
       // Error mapping.
@@ -223,7 +244,7 @@ export function KudoComposeDialog({
       if (err.status === 422 && err.fields && err.fields.length > 0) {
         const map: FieldErrors = {};
         const first = err.fields[0];
-        if (first === 'receiver_id' || first === 'message') {
+        if (first === 'receiver_id' || first === 'title' || first === 'message') {
           map[first] = err.message;
         } else if (first === 'hashtags' || first === 'images') {
           map[first] = err.message;
@@ -332,7 +353,13 @@ export function KudoComposeDialog({
         </p>
       )}
 
-      <MessageTextarea
+      <TitleInput
+        value={values.title}
+        onChange={(v) => dispatch({ type: 'set', patch: { title: v } })}
+        errorMessage={errors.title}
+      />
+
+      <MessageEditor
         value={values.message}
         onChange={(v) => dispatch({ type: 'set', patch: { message: v } })}
         errorMessage={errors.message}

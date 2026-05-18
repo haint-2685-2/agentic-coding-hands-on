@@ -20,7 +20,7 @@ serve(async (req) => {
 
     let q = svc
       .from('kudo_highlights_v')
-      .select('id, sender_id, receiver_id, message, is_anonymous, created_at, total_hearts')
+      .select('id, sender_id, receiver_id, title, message, is_anonymous, created_at, total_hearts')
       .order('total_hearts', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(HIGHLIGHT_LIMIT * 4); // overfetch for filter

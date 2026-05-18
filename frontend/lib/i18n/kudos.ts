@@ -44,6 +44,7 @@ export interface KudosStrings {
   loadError: string;
   retry: string;
   anonymousLabel: string;
+  createdSuccess: string;
 }
 
 const vi: KudosStrings = {
@@ -90,6 +91,7 @@ const vi: KudosStrings = {
   loadError: 'Không tải được dữ liệu.',
   retry: 'Thử lại',
   anonymousLabel: 'Ẩn danh',
+  createdSuccess: 'Đã gửi Kudo thành công!',
 };
 
 const en: KudosStrings = {
@@ -136,6 +138,7 @@ const en: KudosStrings = {
   loadError: 'Failed to load data.',
   retry: 'Retry',
   anonymousLabel: 'Anonymous',
+  createdSuccess: 'Kudo sent successfully!',
 };
 
 const ja: KudosStrings = {
@@ -182,6 +185,7 @@ const ja: KudosStrings = {
   loadError: 'データを読み込めませんでした。',
   retry: 'もう一度',
   anonymousLabel: '匿名',
+  createdSuccess: 'Kudo を送信しました！',
 };
 
 const TABLE: Record<Locale, KudosStrings> = { vi, en, ja };

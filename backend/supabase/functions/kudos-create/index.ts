@@ -9,6 +9,7 @@ import { verifyImagePaths } from '../_shared/storage-verify.ts';
 
 const BodySchema = z.object({
   receiver_id: z.string().uuid(),
+  title: z.string().trim().min(1).max(80),
   message: z.string().min(1).max(1000),
   hashtags: z.array(z.string().min(1)).min(1).max(5),
   image_paths: z.array(z.string()).max(5).default([]),
@@ -42,6 +43,9 @@ serve(async (req) => {
         }
         if (issue.code === 'too_big' && path === 'message') {
           return err(422, 'validation/message_max', 'Message exceeds 1000 chars.');
+        }
+        if (issue.code === 'too_big' && path === 'title') {
+          return err(422, 'validation/title_max', 'Title exceeds 80 chars.');
         }
         if (issue.code === 'too_small' || issue.code === 'invalid_type') {
           return err(422, 'validation/required', `Required field missing or invalid: ${path}`, [path]);
@@ -101,6 +105,7 @@ serve(async (req) => {
     // auth.uid() inside fn_create_kudo resolves to the sender.
     const { data, error } = await ctx.supabase.rpc('fn_create_kudo', {
       p_receiver_id: parsed.receiver_id,
+      p_title: parsed.title,
       p_message: parsed.message,
       p_hashtags: norm.map((n) => n.slug),
       p_image_paths: verified.map((v) => v.path),
@@ -117,6 +122,7 @@ serve(async (req) => {
       if (code === 'P0001') return err(422, 'kudo/self_receiver', 'You cannot send a kudo to yourself.');
       if (code === 'P0002') return err(404, 'user/not_found', 'Receiver not found.');
       if (code === 'P0003') return err(422, 'validation/hashtag_slug', 'Invalid hashtag.');
+      if (code === 'P0004') return err(422, 'validation/title_required', 'Title is required.');
       if (code === '42501') return err(401, 'auth/required', 'Authentication required.');
       return err(500, 'internal/rpc-failed', error.message);
     }

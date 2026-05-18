@@ -156,7 +156,27 @@ export async function requestUploadUrl(
       message: 'Phản hồi không hợp lệ từ máy chủ.',
     };
   }
-  return { ok: true, data: { upload_url: body.upload_url, path: body.path } };
+  // Supabase Storage returns a signed URL using the internal Docker hostname
+  // (e.g. http://kong:8000/...) when running locally, because the auth
+  // container's SUPABASE_URL points at the Kong service inside the network.
+  // The browser cannot resolve `kong`, so rewrite the origin to the public
+  // URL that NEXT_PUBLIC_SUPABASE_URL points at.
+  const publicBase = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  let uploadUrl = body.upload_url;
+  if (publicBase) {
+    try {
+      const u = new URL(uploadUrl);
+      const base = new URL(publicBase);
+      if (u.host !== base.host) {
+        u.protocol = base.protocol;
+        u.host = base.host;
+        uploadUrl = u.toString();
+      }
+    } catch {
+      /* leave as-is if URL parsing fails */
+    }
+  }
+  return { ok: true, data: { upload_url: uploadUrl, path: body.path } };
 }
 
 /**

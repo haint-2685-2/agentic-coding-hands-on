@@ -18,13 +18,14 @@ export interface UserMini {
 
 export interface KudoImage {
   id: string;
-  url: string;
+  path: string;
   position: number;
 }
 
 export interface Kudo {
   id: string;
   created_at: string;
+  title?: string;
   message: string;
   hashtags: string[];
   images: KudoImage[];

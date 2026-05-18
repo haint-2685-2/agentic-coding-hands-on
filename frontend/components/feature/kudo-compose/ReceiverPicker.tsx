@@ -167,7 +167,7 @@ export function ReceiverPicker({
             />
           </button>
 
-          {open && (
+          {open && query.trim().length > 0 && (
             <ul
               id={listboxId}
               ref={listRef}
@@ -205,14 +205,12 @@ export function ReceiverPicker({
                     }`}
                   >
                     <span className="relative h-[32px] w-[32px] overflow-hidden rounded-full bg-[#EEE]">
-                      {u.avatar_url && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={u.avatar_url}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      )}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={u.avatar_url || '/assets/kudos-live-board/default-avatar.svg'}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
                     </span>
                     <span className="flex flex-col">
                       <span className="font-bold">{u.full_name}</span>

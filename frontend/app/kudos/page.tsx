@@ -32,6 +32,7 @@ import { SpotlightPane } from '@/components/feature/kudos-live/SpotlightPane';
 import { SidebarStats } from '@/components/feature/kudos-live/SidebarStats';
 import { LikesProvider } from '@/components/feature/kudos-live/LikesProvider';
 import { EmptyState } from '@/components/feature/kudos-live/EmptyState';
+import { KudoCreatedToast } from '@/components/feature/kudos-live/KudoCreatedToast';
 
 interface KudosPageProps {
   searchParams: {
@@ -118,6 +119,7 @@ export default async function KudosPage({ searchParams }: KudosPageProps) {
       </div>
 
       <HomeHeader locale={locale} strings={homeStrings} me={me} />
+      <KudoCreatedToast message={strings.createdSuccess} />
 
       <LikesProvider initial={seed}>
         <main className="relative z-10 flex flex-col items-center gap-[80px] px-6 pb-[120px] pt-[160px] lg:px-[144px]">

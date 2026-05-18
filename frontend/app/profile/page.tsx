@@ -67,8 +67,6 @@ function HeroCard({ me, strings }: { me: Me; strings: HomeStrings }) {
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase() ?? '')
     .join('');
-  const roleLabel =
-    me.role === 'admin' ? strings.profileRoleAdmin : strings.profileRoleUser;
 
   return (
     <section
@@ -113,33 +111,12 @@ function HeroCard({ me, strings }: { me: Me; strings: HomeStrings }) {
             {me.email}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-[8px] md:justify-start">
-            <RolePill role={me.role} label={roleLabel} />
             {me.department_name && <DepartmentPill name={me.department_name} />}
             <StatusPill active={me.is_active} strings={strings} />
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function RolePill({ role, label }: { role: 'admin' | 'user'; label: string }) {
-  const isAdmin = role === 'admin';
-  return (
-    <span
-      className={[
-        'inline-flex items-center gap-[6px] rounded-full border px-[12px] py-[6px] font-montserrat text-[12px] font-bold uppercase tracking-[1px]',
-        isAdmin
-          ? 'border-saa-gold/60 bg-saa-gold/15 text-saa-gold'
-          : 'border-white/20 bg-white/[0.06] text-white/85',
-      ].join(' ')}
-    >
-      <span
-        aria-hidden="true"
-        className={isAdmin ? 'h-[6px] w-[6px] rounded-full bg-saa-gold' : 'h-[6px] w-[6px] rounded-full bg-white/70'}
-      />
-      {label}
-    </span>
   );
 }
 
@@ -212,16 +189,6 @@ function DetailCard({ me, strings }: { me: Me; strings: HomeStrings }) {
           value={me.department_name ?? strings.profileDepartmentUnset}
         />
         <Field
-          label={strings.profileFieldRole}
-          value={
-            me.role === 'admin' ? strings.profileRoleAdmin : strings.profileRoleUser
-          }
-        />
-        <Field
-          label={strings.profileFieldLocale}
-          value={localeLabel(me.locale, strings)}
-        />
-        <Field
           label={strings.profileFieldStatus}
           value={
             me.is_active
@@ -269,15 +236,3 @@ function upscaleAvatar(url: string, size: number): string {
   return url.replace(/=s\d+-c$/, `=s${size}-c`);
 }
 
-function localeLabel(locale: string, strings: HomeStrings): string {
-  switch (locale) {
-    case 'vi':
-      return strings.profileLocaleVi;
-    case 'en':
-      return strings.profileLocaleEn;
-    case 'ja':
-      return strings.profileLocaleJa;
-    default:
-      return locale;
-  }
-}
